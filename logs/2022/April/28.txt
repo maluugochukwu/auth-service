@@ -1,0 +1,6 @@
+
+[16:50:25]
+GET ~ {"username":"Voltron"} ~ /register ~ [::ffff:127.0.0.1]
+
+[17:50:48]
+GET ~ {} ~ /register ~ [::ffff:127.0.0.1]

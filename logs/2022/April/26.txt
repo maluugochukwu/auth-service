@@ -1,0 +1,60 @@
+
+[11:08:12]
+POST ~ {"username":"Voltron"} ~ /auth ~ [::ffff:127.0.0.1]
+
+[11:08:20]
+POST ~ {"username":"Voltron"} ~ /auth ~ [::ffff:127.0.0.1]
+
+[11:12:19]
+GET ~ {} ~ /auth ~ [::1]
+
+[11:34:24]
+GET ~ {} ~ /auth ~ [::1]
+
+[11:35:56]
+GET ~ {} ~ /auth ~ [::1]
+
+[11:37:38]
+GET ~ {} ~ /auth ~ [::1]
+
+[11:42:34]
+POST ~ {"username":"Voltron"} ~ /auth ~ [::ffff:127.0.0.1]
+
+[11:43:18]
+POST ~ {"username":"Voltron"} ~ /auth ~ [::ffff:127.0.0.1]
+
+[11:44:07]
+POST ~ {"username":"Voltron"} ~ /auth ~ [::ffff:127.0.0.1]
+
+[11:44:26]
+POST ~ {"username":"Voltron"} ~ /auth ~ [::ffff:127.0.0.1]
+
+[11:48:59]
+POST ~ {"username":"Voltron"} ~ /auth ~ [::ffff:127.0.0.1]
+
+[11:50:50]
+POST ~ {"username":"Voltron"} ~ /auth ~ [::ffff:127.0.0.1]
+
+[11:51:31]
+POST ~ {"username":"Voltron"} ~ /auth ~ [::ffff:127.0.0.1]
+
+[11:51:56]
+POST ~ {"username":"Voltron"} ~ /auth ~ [::ffff:127.0.0.1]
+
+[11:52:46]
+POST ~ {"username":"Voltron"} ~ /addUser ~ [::ffff:127.0.0.1]
+
+[11:53:07]
+POST ~ {"username":"Voltron"} ~ /addUser ~ [::ffff:127.0.0.1]
+
+[11:54:16]
+POST ~ {"username":"Voltron"} ~ /auth ~ [::ffff:127.0.0.1]
+
+[11:54:42]
+POST ~ {"username":"Voltron"} ~ /auth ~ [::ffff:127.0.0.1]
+
+[11:59:03]
+POST ~ {"username":"Voltron"} ~ /auth ~ [::ffff:127.0.0.1]
+
+[12:00:58]
+GET ~ {} ~ / ~ [::1]
