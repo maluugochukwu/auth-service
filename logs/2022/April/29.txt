@@ -16,3 +16,21 @@ POST ~ {"username":"Voltron"} ~ /register ~ [::ffff:127.0.0.1]
 
 [18:55:05]
 POST ~ {"username":"Voltron"} ~ /register ~ [::ffff:127.0.0.1]
+
+[21:49:40]
+POST ~ {"username":"Voltron"} ~ /register ~ [::ffff:127.0.0.1]
+
+[22:03:15]
+POST ~ {"username":"Voltron"} ~ /register ~ [::ffff:127.0.0.1]
+
+[22:04:49]
+POST ~ {"username":"Voltron"} ~ /register ~ [::ffff:127.0.0.1]
+
+[22:05:28]
+POST ~ {"username":"Voltron"} ~ /register ~ [::ffff:127.0.0.1]
+
+[22:10:01]
+POST ~ {"username":"Voltron"} ~ /register ~ [::ffff:127.0.0.1]
+
+[22:11:41]
+POST ~ {"username":"ugo@mail.com"} ~ /register ~ [::ffff:127.0.0.1]
