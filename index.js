@@ -21,18 +21,7 @@ app.use('/auth',
     ]
 );
 app.use('/register',require('./routes/register'));
-app.get('/', (req, res) => {
-    res.send("Am good");
-})
-app.post('/addUser', (req, res) => {
-    res.json({"message":req.body.username});
-})
-app.post('/register', (req, res) => {
-    res.json({"message":req.body.username});
-})
-app.post('/logout', (req, res) => {
-    res.json({"message":req.body.username});
-})
+
 
 
 app.post('/kido/:passid', (req, res) => {

@@ -1,0 +1,18 @@
+
+[18:43:48]
+POST ~ {"username":"Voltron"} ~ /register ~ [::ffff:127.0.0.1]
+
+[18:44:06]
+POST ~ {"username":"Voltron"} ~ /register ~ [::ffff:127.0.0.1]
+
+[18:50:23]
+POST ~ {"username":"Voltron"} ~ /register ~ [::ffff:127.0.0.1]
+
+[18:52:31]
+POST ~ {"username":"Voltron"} ~ /register ~ [::ffff:127.0.0.1]
+
+[18:53:13]
+POST ~ {"username":"Voltron"} ~ /register ~ [::ffff:127.0.0.1]
+
+[18:55:05]
+POST ~ {"username":"Voltron"} ~ /register ~ [::ffff:127.0.0.1]
