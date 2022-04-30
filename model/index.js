@@ -10,5 +10,8 @@ const db = {}
 db.sequelize = sequelize;
 const models = {}
 models.User = require('./user')(sequelize,Sequelize.DataTypes);
+models.Role = require('./role')(sequelize,Sequelize.DataTypes);
+models.Product = require('./product')(sequelize,Sequelize.DataTypes);
+models.ProductImage = require('./product_image')(sequelize,Sequelize.DataTypes);
 
 module.exports = {db,models};
