@@ -11,8 +11,5 @@ const schemaRule = [
 
 
 register.post('/',schemaRule,validateRegistration,
-(req,res)=>{
-    
-    res.send("You have reached the register route.");
-})
+require('../controller/register'))
 module.exports = register;

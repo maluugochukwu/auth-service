@@ -2,13 +2,26 @@ const express = require('express');
 const app = express();
 const logger = require('./middleware/logEvents');
 const cors = require("cors");
+const {db} = require("./model");
+
+// table models sync
+(async ()=>{
+  await db.sequelize.sync();  
+})()
+//
+
+// enabling cors for third party apps
+app.use(cors({
+    origin:"*"
+}))
+
 app.use(express.json());
 
 // Logger middleware
 app.use(logger);
-app.use(cors({
-    origin:"*"
-}))
+
+
+
 // route for user login
 app.use('/auth',
     [
