@@ -15,7 +15,7 @@ module.exports = (sequelize,DataTypes)=>{
             type:DataTypes.INTEGER
         },
         price:{
-            type:DataTypes.FLOAT
+            type:DataTypes.DECIMAL(10,2)
         },
         img:{
             type:DataTypes.STRING(220)

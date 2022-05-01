@@ -11,21 +11,41 @@ const logEvents = async (message,logName) => {
     const month = `${format(new Date(),'MMMM')}`
     const day = `${format(new Date(),'dd')}`
 
-    try{
-        if(!fs.existsSync(path.join(__dirname,'..',`logs/${year}`)))
-        {
-            await fs.mkdirSync(path.join(__dirname,'..',`logs/${year}`))
-            if(!fs.existsSync(path.join(__dirname,'..',`logs/${year}/${month}`)))
+    const createDir = new Promise(async (resolve, reject)=>{
+        try{
+            if(!fs.existsSync(path.join(__dirname,'..',`logs`)))
             {
-                await fs.mkdirSync(path.join(__dirname,'..',`logs/${year}/${month}`))
+                await fs.mkdirSync(path.join(__dirname,'..',`logs`))
+                
             }
+            if(!fs.existsSync(path.join(__dirname,'..',`logs/${year}`)))
+            {
+                await fs.mkdirSync(path.join(__dirname,'..',`logs/${year}`))
+                await fs.mkdirSync(path.join(__dirname,'..',`logs/${year}/${month}`))
+            }else{
+                if(!fs.existsSync(path.join(__dirname,'..',`logs/${year}/${month}`)))
+                {
+                    await fs.mkdirSync(path.join(__dirname,'..',`logs/${year}/${month}`))
+                }
+            }
+            
+            
+            resolve(true);
         }
-        await fsPromise.appendFile(path.join(__dirname,'..',`logs/${year}/${month}`,logName),logItem)
+        catch(err){
+            reject(err)
+        }
+        
+    })
+    try{
+        // console.log(createDir)
+        createDir.then(async (rr)=>{
+            await fsPromise.appendFile(path.join(__dirname,'..',`logs/${year}/${month}`,logName),logItem)
+        })
     }
     catch(err){
         console.log(err)
     }
-
 }
 const logger = (req,res,next)=>{
     const message = `${req?.method} ~ ${JSON.stringify(req?.body) } ~ ${req.url} ~ [${req.socket.remoteAddress}]`;
