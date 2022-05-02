@@ -13,6 +13,7 @@ const models                = {}
 models.User                 = require('./user')(sequelize,Sequelize.DataTypes);
 models.Role                 = require('./role')(sequelize,Sequelize.DataTypes);
 models.UserRole             = require('./user_role')(sequelize,Sequelize.DataTypes);
+models.UserRefreshToken     = require('./user_refresh_token')(sequelize,Sequelize.DataTypes);
 models.Product              = require('./product')(sequelize,Sequelize.DataTypes);
 models.ProductImage         = require('./product_image')(sequelize,Sequelize.DataTypes);
 models.Option               = require('./option')(sequelize,Sequelize.DataTypes);

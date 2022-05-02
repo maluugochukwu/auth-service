@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const logger = require('./middleware/logEvents');
 const cors = require("cors");
+const cookieParser = require('cookie-parser');
 const {db} = require("./model");
 
 // table models sync
@@ -14,25 +15,21 @@ const {db} = require("./model");
 app.use(cors({
     origin:"*"
 }))
-
+app.use(express.urlencoded({ extended: false }))
 app.use(express.json());
-
+app.use(cookieParser())
 // Logger middleware
 app.use(logger);
 
 
 
 // route for user login
-app.use('/auth',
-    [
-        (req,res,next)=>{
-            console.log("You have reached the user middleware")
-            // res.sendStatus(403)
-            next()
-        },
-        require('./routes/users')
-    ]
-);
+app.use('/auth',require('./routes/auth'));
+
+// route for get users
+app.use('/user',require('./routes/users'));
+
+// route for user registeration
 app.use('/register',require('./routes/register'));
 
 
