@@ -4,7 +4,8 @@ const validateRegistration = require("../middleware/validateRegistration");
 const { body } = require('express-validator');
 
 const schemaRule = [
-    body("username").isEmail()
+    body("username").isEmail(),
+    body("password").isEmail(),
 ]
     
     

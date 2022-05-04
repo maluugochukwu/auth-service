@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const logger = require('./middleware/logEvents');
 const cors = require("cors");
+const db = require('./model')
+
+
 app.use(express.json());
 
 // Logger middleware
