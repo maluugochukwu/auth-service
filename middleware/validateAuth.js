@@ -1,14 +1,15 @@
 const { models: {User} }    = require('../model');
 const { body,validationResult }  = require('express-validator');
+const bcrypt = require('bcrypt');
 
 // Data validation RULES --------------------------------
 const schemaRule = [
     body("username").isEmail().withMessage({code:78,message:"Must be a valid email"}),
-    body("password",{code:14,message:"Password must have min of 8 characters and contain a number"}).isLength({min:8}).matches(/\d/)
+    body("password",{code:14,message:"Password is required"}).not().isEmpty().trim()
 ]
 // ------
 
-const validateRegistration = async (req,res,next)=>{
+const validateAuth = async (req,res,next)=>{
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         const errmessg = errors.array();
@@ -25,15 +26,23 @@ const validateRegistration = async (req,res,next)=>{
         where:{
             username: username
         }
-    }).then((items)=>{
+    }).then(async (items)=>{
         if(items.length !== 0){
-            res.status(409).json({message:"Record already exist"})
+            const hashedPassword = items[0].password;
+            const match = await bcrypt.compare(password,hashedPassword);
+            if(match)
+            {
+                next()
+            }else
+            {
+                res.status(409).json({message:"username or password is incorrect"})
+            }
         }else
         {
-            next();
+            res.status(409).json({message:"username or password is incorrect"})
         }
         
     })
 }
 
-module.exports = [schemaRule,validateRegistration];
+module.exports = [schemaRule,validateAuth];

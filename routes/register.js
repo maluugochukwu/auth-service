@@ -1,19 +1,5 @@
 const app      = require('express');
 const register = app.Router();
-const validateRegistration = require("../middleware/validateRegistration");
-const { body } = require('express-validator');
-
-const schemaRule = [
-    body("username").isEmail(),
-    body("password").isEmail(),
-]
-    
-    
-
-
-register.post('/',schemaRule,validateRegistration,
-(req,res)=>{
-    
-    res.send("You have reached the register route.");
-})
+const regMiddleware = require('../middleware/validateRegistration')
+register.post('/',regMiddleware,require('../controller/register'))
 module.exports = register;
