@@ -50,7 +50,7 @@ const refreshToken = async (req,res)=>{
 
                 await traansactionHandler.commit();
 
-                res.cookie('jwt',refreshToken, {httpOnly:true,maxAge:24 * 60 * 60 * 1000});
+                res.cookie('jwt',refreshToken, {httpOnly:true,maxAge:24 * 60 * 60 * 1000,samesite:'None',secure:true});
 
                 res.json({message:"access token created",accessToken})
             }

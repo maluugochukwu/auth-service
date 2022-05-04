@@ -23,7 +23,7 @@ const auth = async (req,res)=>{
     //save refreshToken to db for the user
     UserRefreshToken.create({username: username,refresh_token:refreshToken});
     
-    res.cookie('jwt',refreshToken, {httpOnly:true,maxAge:24 * 60 * 60 * 1000});
+    res.cookie('jwt',refreshToken, {httpOnly:true,maxAge:24 * 60 * 60 * 1000,samesite:'None',secure:true});
 
     res.json({message:"login ok",accessToken})
 }

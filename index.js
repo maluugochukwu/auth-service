@@ -3,6 +3,7 @@ const app = express();
 const logger = require('./middleware/logEvents');
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
+const headers = require('./middleware/headers')
 const {db} = require("./model");
 
 // table models sync
@@ -17,6 +18,7 @@ app.use(cors({
 }))
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json());
+app.use(headers)
 app.use(cookieParser())
 // Logger middleware
 app.use(logger);
