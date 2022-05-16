@@ -15,6 +15,12 @@ const getAllProducts = async (req,res)=>{
          const [results, metadata] = await db.sequelize.query(`SELECT * FROM product LEFT JOIN product_category ON product.category_id = product_category.id WHERE 1 = 1 ${filter}`);
     res.json({responseCode:0,responseMessage:"OK",data:{category:{id:category,name:results[0]["name"]},product:results}});
 }
+const getProductByCategory = async (req,res) => {
+    const category = req.params.id;
+    console.log(category);
+    const [results, metadata] = await db.sequelize.query(`SELECT * FROM product LEFT JOIN product_category ON product.category_id = product_category.id WHERE product.category_id = '${category}'`);
+    res.json({responseCode:0,responseMessage:"OK",data:{product:results}});
+}
 const getProductShowcase = async (req,res)=>{
     const showcase = await getActiveShowcase();
     const output = [];
@@ -45,5 +51,6 @@ const getActiveShowcase = async ()=>{
 module.exports = {
     getAllProducts,
     createProducts,
-    getProductShowcase
+    getProductShowcase,
+    getProductByCategory
 };
