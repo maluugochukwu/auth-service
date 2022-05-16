@@ -1,18 +1,17 @@
 module.exports = (sequelize,DataTypes)=>{
-    const ProductTag = sequelize.define('product_tag',
+    const Showcase = sequelize.define('showcase',
     {
-       
-        product_id:{
+        name:{
             type:DataTypes.STRING(150),
             allowNull:false
         },
-        tag_id:{
-            type:DataTypes.STRING(30)
+        time_bound:{
+            type:DataTypes.TINYINT
         }
     },
     {
         freezeTableName:true
     }
     )
-    return ProductTag;
+    return Showcase;
 }

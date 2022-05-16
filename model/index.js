@@ -21,5 +21,8 @@ models.ProductOption        = require('./productoption')(sequelize,Sequelize.Dat
 models.ProductCategory      = require('./product_category')(sequelize,Sequelize.DataTypes);
 models.ProductSubCategory   = require('./product_sub_category')(sequelize,Sequelize.DataTypes);
 models.Order                = require('./order')(sequelize,Sequelize.DataTypes);
+models.Showcase             = require('./showcase')(sequelize,Sequelize.DataTypes);
+models.ProductShowcase      = require('./product_showcase')(sequelize,Sequelize.DataTypes);
+models.Tag                  = require('./tags')(sequelize,Sequelize.DataTypes);
 
 module.exports = {db,models};

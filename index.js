@@ -34,6 +34,9 @@ app.use('/user',require('./routes/users'));
 // route for user registeration
 app.use('/register',require('./routes/register'));
 
+// route for product
+app.use('/product',require('./routes/product'));
+
 
 
 app.post('/kido/:passid', (req, res) => {

@@ -33,7 +33,8 @@ const validateAuth = async (req,res,next)=>{
             if(match)
             {
                 next()
-            }else
+            }
+            else
             {
                 res.status(409).json({message:"username or password is incorrect"})
             }
