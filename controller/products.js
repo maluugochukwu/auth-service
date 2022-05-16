@@ -8,7 +8,6 @@ const getAllProducts = async (req,res)=>{
     console.log(req.query.cat);
     const {category,price,brand} = req.body;
     let filter = "";
-    filter += (typeof category !== 'undefined') ? ` AND product.category_id = ${category}`:"";
     filter += (typeof price !== 'undefined') ? ` AND product.price BETWEEN ${price[0]} AND ${price[1]}`:"";
 
 
