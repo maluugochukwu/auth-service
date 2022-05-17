@@ -1,10 +1,12 @@
 const { models: {User} }    = require('../model');
-const { body,validationResult,check }  = require('express-validator');
+const { body,validationResult }  = require('express-validator');
+
+const allowedFields = ['nam'];
 
 // Data validation RULES --------------------------------
 const schemaRule = [
-    check("username").exists().withMessage({responseCode:78,responseMessage:"username field is missing"}).bail().isEmail().withMessage({responseCode:78,responseMessage:"Must be a valid email"}),
-    check("password",{responseCode:14,responseMessage:"Password must have min of 8 characters and contain a number"}).isLength({min:8}).matches(/\d/)
+    body("name").isIn(['123', 'password', 'god']),
+    body("password",{responseCode:14,responseMessage:"Password must have min of 8 characters and contain a number"}).isLength({min:8}).matches(/\d/)
 ]
 // ------
 

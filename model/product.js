@@ -14,6 +14,9 @@ module.exports = (sequelize,DataTypes)=>{
         category_id:{
             type:DataTypes.INTEGER
         },
+        brand_id:{
+            type:DataTypes.INTEGER
+        },
         price:{
             type:DataTypes.DECIMAL(10,2)
         },
