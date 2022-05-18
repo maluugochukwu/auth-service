@@ -5,8 +5,8 @@ const allowedFields = ['nam'];
 
 // Data validation RULES --------------------------------
 const schemaRule = [
-    body("name").isIn(['123', 'password', 'god']),
-    body("password",{responseCode:14,responseMessage:"Password must have min of 8 characters and contain a number"}).isLength({min:8}).matches(/\d/)
+    body("name",{responseCode:14,responseMessage:"name field is required"}).isLength({min:2}).withMessage({responseCode:17,responseMessage:"Product name length is too short"}),
+    body("description",{responseCode:14,responseMessage:"description field is required"}),
 ]
 // ------
 
@@ -20,22 +20,7 @@ const validateRegistration = async (req,res,next)=>{
         }
        return res.status(400).json({ errors: errmessg2 });
     }
-
-    const {username,password} = req.body;
-    // check if username exist in database
-    User.findAll({
-        where:{
-            username: username
-        }
-    }).then((items)=>{
-        if(items.length !== 0){
-            res.status(409).json({message:"Record already exist"})
-        }else
-        {
-            next();
-        }
-        
-    })
+    next();
 }
 
 module.exports = [schemaRule,validateRegistration];

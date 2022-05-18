@@ -17,8 +17,15 @@ const getAllFilteredProducts = async (req,res)=>{
     res.json({responseCode:0,responseMessage:"OK",data:{product:results}});
 }
 const addProduct = async (req,res) => {
-    const productObj = req.body
-    await Product.create(productObj)
+    const {name,description, weight, categoryId:category_id, brandId:brand_id, price} = req.body
+    const dbData = {name,description, weight, category_id, brand_id, price}
+    try{
+        const result = await Product.create(dbData)
+        res.json({responseCode:0,responseMessage:"Product saved"})
+    }catch(er)
+    {
+        res.json({responseCode:11,responseMessage:"Could not save product"})
+    }
 }
 const editProduct = async (req,res) => {
     
@@ -64,5 +71,6 @@ module.exports = {
     createProducts,
     getProductShowcase,
     getProductByCategory,
-    getAllFilteredProducts
+    getAllFilteredProducts,
+    addProduct
 };
