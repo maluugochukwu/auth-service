@@ -5,8 +5,9 @@ const allowedFields = ['nam'];
 
 // Data validation RULES --------------------------------
 const schemaRule = [
-    body("name",{responseCode:14,responseMessage:"name field is required"}).isLength({min:2}).withMessage({responseCode:17,responseMessage:"Product name length is too short"}),
-    body("description",{responseCode:14,responseMessage:"description field is required"}),
+    body("name",{responseCode:14,responseMessage:"name field is required"}).exists().isLength({min:2}).withMessage({responseCode:17,responseMessage:"Product name length is too short"}),
+    body("description",{responseCode:14,responseMessage:"description field is required"}).exists(),
+    body("weight",{responseCode:14,responseMessage:"weight field is required"}).exists(),
 ]
 // ------
 

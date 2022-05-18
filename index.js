@@ -8,8 +8,8 @@ const {db} = require("./model");
 
 // table models sync
 (async ()=>{
-  await db.sequelize.sync();  
-//   await db.sequelize.sync({ alter: true });  
+//   await db.sequelize.sync();  
+  await db.sequelize.sync({ alter: true });  
 })()
 //
 

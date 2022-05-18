@@ -28,7 +28,15 @@ const addProduct = async (req,res) => {
     }
 }
 const editProduct = async (req,res) => {
-    
+    const {name,description, weight, categoryId:category_id, brandId:brand_id, price} = req.body
+    const dbData = {name,description, weight, category_id, brand_id, price}
+    try{
+        const result = await Product.update(dbData,{where:{id:req.params.id}})
+        res.json({responseCode:0,responseMessage:"Product updated"})
+    }catch(er)
+    {
+        res.json({responseCode:11,responseMessage:er})
+    }
 }
 const deleteProduct = async (req,res) => {
     
@@ -72,5 +80,6 @@ module.exports = {
     getProductShowcase,
     getProductByCategory,
     getAllFilteredProducts,
-    addProduct
+    addProduct,
+    editProduct
 };

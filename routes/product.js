@@ -7,4 +7,5 @@ router.get('/showcase', productController.getProductShowcase)
 router.post('/filtered', productController.getAllFilteredProducts)
 router.get('/category/:id', productController.getProductByCategory)
 router.put('/', productMiddleware,productController.addProduct)
+router.put('/:id', productMiddleware,productController.editProduct)
 module.exports = router;
