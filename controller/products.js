@@ -28,10 +28,27 @@ const addProduct = async (req,res) => {
     }
 }
 const editProduct = async (req,res) => {
-    const {name,description, weight, categoryId:category_id, brandId:brand_id, price} = req.body
-    const dbData = {name,description, weight, category_id, brand_id, price}
+    
+    const validKeys = ["name","description","weight","categoryId","brandId","price"];
+    for (var property in req.body) 
+    {
+        if(!validKeys.includes(property))
+        {
+            res.json({responseCode:91,responseMessage:`${property} is not a valid field`})
+            return
+        }
+    }
+    const newArr = {};
+    if(req.body.name) newArr.name = req.body.name
+    if(req.body.description) newArr.description = req.body.description
+    if(req.body.weight) newArr.weight = req.body.weight
+    if(req.body.categoryId) newArr.category_id = req.body.categoryId
+    if(req.body.brandId) newArr.brand_id = req.body.brandId
+    if(req.body.price) newArr.price = req.body.price
+
+    console.log(newArr)
     try{
-        const result = await Product.update(dbData,{where:{id:req.params.id}})
+        const result = await Product.update(newArr,{where:{id:req.params.id}})
         res.json({responseCode:0,responseMessage:"Product updated"})
     }catch(er)
     {
@@ -39,7 +56,13 @@ const editProduct = async (req,res) => {
     }
 }
 const deleteProduct = async (req,res) => {
-    
+    try{
+        const count = await Product.destroy({ where: { id:req.params.id } });
+        res.json({responseCode:0,responseMessage:`${count} product deleted`})
+    }catch(er)
+    {
+        res.json({responseCode:11,responseMessage:er})
+    }
 }
 const getProductByCategory = async (req,res) => {
     const category = req.params.id;
@@ -65,9 +88,6 @@ const getProductShowcase = async (req,res)=>{
         res.json({responseCode:45,responseMessage:"No showcase available",data:null});
     }
 }
-const createProducts = async (req,res)=>{
-    
-}
 const getActiveShowcase = async ()=>{
     const [results, metadata] = await db.sequelize.query("SELECT id,name FROM showcase");
     return results;
@@ -75,11 +95,10 @@ const getActiveShowcase = async ()=>{
 
 
 module.exports = {
-    
-    createProducts,
     getProductShowcase,
     getProductByCategory,
     getAllFilteredProducts,
     addProduct,
-    editProduct
+    editProduct,
+    deleteProduct
 };
