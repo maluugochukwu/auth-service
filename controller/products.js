@@ -1,6 +1,4 @@
 const { models: {Product,Tag,Showcase,ProductShowcase},db }  = require('../model');
-const bcrypt = require('bcrypt');
-const { reject } = require('bcrypt/promises');
 
 
 const getAllFilteredProducts = async (req,res)=>{

@@ -46,4 +46,5 @@ const validateAuth = async (req,res,next)=>{
     })
 }
 
+
 module.exports = [schemaRule,validateAuth];
