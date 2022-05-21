@@ -68,6 +68,11 @@ const getProductByCategory = async (req,res) => {
     const [results, metadata] = await db.sequelize.query(`SELECT * FROM product INNER JOIN product_category ON product.category_id = product_category.id WHERE product.category_id = '${category}'`);
     res.json({responseCode:0,responseMessage:"OK",data:{product:results}});
 }
+const searchProduct = async (req,res) => {
+    const query = req.params.query;
+    const [results, metadata] = await db.sequelize.query(`SELECT * FROM product INNER JOIN product_category ON product.category_id = product_category.id INNER JOIN product_tag ON product.id = product_tag.product_id  WHERE product_tag.tagname LIKE '%${query}%' OR product.name LIKE '%${query}%' `);
+    res.json({responseCode:0,responseMessage:"OK",data:{product:results}});
+}
 const getProductShowcase = async (req,res)=>{
     const showcase = await getActiveShowcase();
     const output = [];
@@ -98,5 +103,6 @@ module.exports = {
     getAllFilteredProducts,
     addProduct,
     editProduct,
-    deleteProduct
+    deleteProduct,
+    searchProduct
 };

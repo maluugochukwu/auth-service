@@ -38,6 +38,9 @@ app.use('/register',require('./routes/register'));
 // route for product
 app.use('/product',require('./routes/product'));
 
+// route for tag
+app.use('/tag',require('./routes/tag'));
+
 
 
 app.post('/kido/:passid', (req, res) => {

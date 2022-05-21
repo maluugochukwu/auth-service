@@ -8,4 +8,5 @@ router.post('/filtered', productController.getAllFilteredProducts)
 router.get('/category/:id', productController.getProductByCategory)
 router.put('/', productMiddleware,productController.addProduct)
 router.put('/:id', productMiddleware,productController.editProduct)
+router.get('/search/:query',productController.searchProduct)
 module.exports = router;

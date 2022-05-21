@@ -1,13 +1,13 @@
 module.exports = (sequelize,DataTypes)=>{
     const ProductTag = sequelize.define('product_tag',
     {
-       
-        product_id:{
+        tagname:{
             type:DataTypes.STRING(150),
-            allowNull:false
+            primaryKey:true
         },
-        tag_id:{
-            type:DataTypes.STRING(30)
+        product_id:{
+            type:DataTypes.INTEGER(11),
+            primaryKey:true
         }
     },
     {
