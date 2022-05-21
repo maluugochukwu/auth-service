@@ -1,11 +1,11 @@
-
+require('dotenv').config();
 
 const validateAuthProvider = async (req,res,next)=>{
     if(req.params.provider === 1) // ===============  GOOGLE Provider Service ======================
     {
         const {OAuth2Client} = require('google-auth-library');
-        const CLIENT_ID = "335006090314-6kk4mmbitkrmpn24mq5lhvbakb7fbkem.apps.googleusercontent.com";
-        const CLIENT_SECRET = "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";
+        const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+        const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
         const client = new OAuth2Client(CLIENT_ID);
 
         const token = req.body.token
