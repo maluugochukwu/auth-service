@@ -21,10 +21,16 @@ const validateAuthProvider = async (req,res,next)=>{
         {
             if(payload.aud == CLIENT_ID)
             {
-
+                next()
+            }else
+            {
+                res.json({responseCode:58,responseMessage:"Could not verify token"})
             }
+        }else
+        {
+            res.json({responseCode:58,responseMessage:"Could not verify token"})
         }
-        const userid = payload['sub'];
+        // const userid = payload['sub'];
     }
     
 }

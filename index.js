@@ -32,6 +32,9 @@ app.use('/auth',require('./routes/auth'));
 // route for get users
 app.use('/user',require('./routes/users'));
 
+// route for roles
+app.use('/role',require('./routes/role'));
+
 // route for user registeration
 app.use('/register',require('./routes/register'));
 

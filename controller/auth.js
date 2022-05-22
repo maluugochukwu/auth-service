@@ -1,6 +1,13 @@
 const { models: {UserRefreshToken} }  = require('../model');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+
+const login                 = async (req,res)=>{}
+const loginWithProvider     = async (req,res)=>{}
+const register              = async (req,res)=>{}
+const registerWithProvider  = async (req,res)=>{}
+const issueToken            = async (req,res)=>{}
+
 const auth = async (req,res)=>{
     const {username} = req.body;
     

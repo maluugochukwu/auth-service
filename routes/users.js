@@ -19,15 +19,7 @@ router.post('/',verifyJwt, function(req, res) {
     res.json({"message":req.body.username});
 })
 
-// user want to login using username and password 
-router.post('/auth',verifyJwt, function(req, res) {
-    res.json({"message":req.body.username});
-})
 
-// user want to login using 3rd party provider
-router.post('/auth/:provider_id',verifyJwt, function(req, res) {
-    res.json({"message":req.body.username});
-})
 
 // user want to logout
 router.get('/logout',verifyJwt, function(req, res) {

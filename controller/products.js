@@ -50,7 +50,7 @@ const editProduct = async (req,res) => {
         res.json({responseCode:0,responseMessage:"Product updated"})
     }catch(er)
     {
-        res.json({responseCode:11,responseMessage:er})
+        res.json({responseCode:11,responseMessage:"Could not update product"})
     }
 }
 const deleteProduct = async (req,res) => {
