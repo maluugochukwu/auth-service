@@ -19,6 +19,9 @@ module.exports = (sequelize,DataTypes)=>{
         lastname:{
             type:DataTypes.STRING(200)
         },
+        provider_id:{
+            type:DataTypes.INTEGER(11)
+        },
     },
     {
         freezeTableName:true

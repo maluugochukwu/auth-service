@@ -23,7 +23,8 @@ models.ProductSubCategory   = require('./product_sub_category')(sequelize,Sequel
 models.Order                = require('./order')(sequelize,Sequelize.DataTypes);
 models.Showcase             = require('./showcase')(sequelize,Sequelize.DataTypes);
 models.ProductShowcase      = require('./product_showcase')(sequelize,Sequelize.DataTypes);
-models.ProductTag                  = require('./product_tags')(sequelize,Sequelize.DataTypes);
+models.ProductTag           = require('./product_tags')(sequelize,Sequelize.DataTypes);
 models.Brand                = require('./brand')(sequelize,Sequelize.DataTypes);
+models.AuthProvider         = require('./auth_provider')(sequelize,Sequelize.DataTypes);
 
 module.exports = {db,models};

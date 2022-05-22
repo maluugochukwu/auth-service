@@ -9,15 +9,20 @@ const login = async (req,res)=>{
     //save refreshToken to db for the user
     UserRefreshToken.create({username: username,refresh_token:tokens.refreshToken});
     
-    res.cookie('jwt',tokens.refreshToken, {httpOnly:true,maxAge:24 * 60 * 60 * 1000,samesite:'None',secure:true});
+    res.cookie('jwt',tokens.refreshToken, {
+        httpOnly:true,maxAge:24 * 60 * 60 * 1000,samesite:'None',secure:true
+    });
 
-    res.json({message:"login ok",accessToken:tokens.accessToken})
+    res.json({responseCode:0,responseMessage:"login ok",accessToken:tokens.accessToken})
 }
 const loginWithProvider     = async (req,res)=>{
     // check if user is already in database. if so get the user provider id
     // if the provider id matches the one passed in the query parameters; then issue a token.
     // if it does not match the one passed in the query parameters, notify the user to use the appropriate provider
     // in the case where the user does not exist in the database, create a new user and issue a token
+    const username = res.locals.username
+    const user = await User.findAll({where: {username:username}})
+    res.json({success: res.locals.username})
 }
 const register              = async (req,res)=>{
 
@@ -53,5 +58,6 @@ const issueToken = async username =>{
 }
 
 module.exports = {
-    login
+    login,
+    loginWithProvider
 };
