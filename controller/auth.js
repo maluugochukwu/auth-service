@@ -31,7 +31,7 @@ const issueToken = async username =>{
     const roles = await UserRole.findAll({where: {username: username}})
    
     const userRoles = []
-    roles.forEach(role => userRoles.push(role.role_id))
+    roles.forEach(role => userRoles.push({id:role.role_id,name:""}))
     console.log(userRoles,"my roles")
     const accessToken = jwt.sign(
         {
