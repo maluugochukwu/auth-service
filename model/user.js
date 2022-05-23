@@ -5,7 +5,11 @@ module.exports = (sequelize,DataTypes)=>{
             type:DataTypes.STRING(200),
             unique:true,
             allowNull:false,
-            primaryKey:true,
+            primaryKey:true
+        },
+        email:{
+            type:DataTypes.STRING(200),
+            allowNull:false,
             validate:{
                 isEmail: true,
             }
@@ -20,7 +24,11 @@ module.exports = (sequelize,DataTypes)=>{
             type:DataTypes.STRING(200)
         },
         provider_id:{
-            type:DataTypes.INTEGER(11)
+            type:DataTypes.INTEGER(11),
+            defaultValue:0
+        },
+        profile_photo:{
+            type:DataTypes.TEXT
         },
     },
     {

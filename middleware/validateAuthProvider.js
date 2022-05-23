@@ -23,7 +23,7 @@ const validateAuthProvider = async (req,res,next)=>{
             {
                 if(payload.aud == CLIENT_ID)
                 {
-                    res.locals.username = payload.email
+                    res.locals.payload = payload
                     next()
                 }else
                 {
