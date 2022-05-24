@@ -1,5 +1,6 @@
 const { models: {UserRefreshToken,User,UserRole,Role},db }  = require('../model');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer')
 require('dotenv').config();
 
 const login = async (req,res)=>{
@@ -132,6 +133,30 @@ const registration = async (obj,provider_id)=>{
             await UserRole.bulkCreate(user_role,{transaction:transactionHandler}) // save user role
             await User.create(obj,{transaction:transactionHandler}) // save user record to user table
             await transactionHandler.commit()
+            if(provider_id == 0)
+            {
+                var transport = nodemailer.createTransport({
+                    host: "smtp.mailtrap.io",
+                    port: 2525,
+                    auth: {
+                      user: "01fffa0ca8ebab",
+                      pass: "7fb0ebe681203e"
+                    }
+                  });
+                  const message = {
+                    from: "from-example@email.com",
+                    to: "ugo.malue@accessng.com",
+                    subject: "Subject",
+                    text: "Hello SMTP Email"
+               }
+               transport.sendMail(message, function(err, info) {
+                    if (err) {
+                      console.log(err)
+                    } else {
+                      console.log(info);
+                    }
+                })
+            }
            return true;
     }
     catch(e){
