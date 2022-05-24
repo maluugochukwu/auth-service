@@ -2,8 +2,7 @@ module.exports = (sequelize,DataTypes)=>{
     const AuthProvider = sequelize.define('auth_provider',
     {
         name:{
-            type:DataTypes.STRING(200),
-            unique:true,
+            type:DataTypes.STRING(50),
             allowNull:false
         },
         secret:{

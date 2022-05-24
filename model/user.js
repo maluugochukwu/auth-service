@@ -30,6 +30,10 @@ module.exports = (sequelize,DataTypes)=>{
         profile_photo:{
             type:DataTypes.TEXT
         },
+        is_email_verified:{
+            type:DataTypes.CHAR(1),
+            defaultValue:0
+        },
     },
     {
         freezeTableName:true

@@ -1,4 +1,4 @@
-const { models: {UserRefreshToken,User,UserRole} }  = require('../model');
+const { models: {UserRefreshToken,User,UserRole,Role},db }  = require('../model');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -15,23 +15,17 @@ const login = async (req,res)=>{
     res.json({responseCode:0,responseMessage:"login ok",accessToken:tokens.accessToken})
 }
 const loginWithProvider     = async (req,res)=>{
-    // check if user is already in database. if so get the user provider id
-    // if the provider id matches the one passed in the query parameters; then issue a token.
-    // if it does not match the one passed in the query parameters, notify the user to use the appropriate provider
-    // in the case where the user does not exist in the database, create a new user and issue a token
     const payload = res.locals.payload
-    const username = payload.username
+    const username = payload.email
     const provider_id = req.params.provider
     const user = await User.findAll({where: {username:username}})
-    if(user)
+    if(user?.length>0)
     {
         const user_provider_id = user[0].provider_id
         if(provider_id == user_provider_id)
         {
             const tokens = await issueToken(username)
-            res.cookie('jwt',tokens.refreshToken, {
-                httpOnly:true,maxAge:24 * 60 * 60 * 1000,samesite:'None',secure:true
-            });
+            setRefreshTokenCookie(tokens.refreshToken,res)
             res.json({responseCode:0,responseMessage:"login ok",accessToken:tokens.accessToken})
         }else
         {
@@ -45,20 +39,34 @@ const loginWithProvider     = async (req,res)=>{
         const obj = {
             username:username,
             email:username,
+            role:[
+                process.env.DEFAULT_USER_ROLE
+            ],
             firstname,
             lastname,
             profile_photo,
-            provider_id
+            provider_id,
+            
         }
-        const create_user = await registration(obj,[210])
-        const tokens = await issueToken(username)
-        setRefreshTokenCookie(tokens.refreshToken,res)
+        const create_user = await registration(obj,provider_id)
+        if(create_user)
+        {
+            const tokens = await issueToken(username)
+            
+            setRefreshTokenCookie(tokens.refreshToken,res)
+            
+            res.json({responseCode:0,responseMessage:"login ok",accessToken:tokens.accessToken})
+        }else
+        {
+            res.json({responseCode:55,responseMessage:"Could not create user"})
+        }
         
-        res.json({responseCode:0,responseMessage:"login ok",accessToken:tokens.accessToken})
     }
 }
 const register              = async (req,res)=>{
-
+    // const dbData = {};
+    // if(req.body.username) 
+    // registration();
 }
 const registerWithProvider  = async (req,res)=>{
 
@@ -68,11 +76,17 @@ const auth = async (req,res)=>{
     
 }
 const issueToken = async username =>{
-    const roles = await UserRole.findAll({where: {username: username}})
-   
+    
+    const roles = await Role.findAll({
+        include: [{
+            model: UserRole,
+            required: true,
+            where: {username: username}
+           }]
+    })
     const userRoles = []
     roles.forEach(role => userRoles.push({id:role.role_id,name:""}))
-    console.log(userRoles,"my roles")
+    console.log(roles,"my roles")
     const accessToken = jwt.sign(
         {
             username:username,
@@ -89,28 +103,49 @@ const issueToken = async username =>{
         process.env.REFRESH_TOKEN_SECRET,
         {expiresIn:'1d'}
     );
+    await saveRefreshToken(username,refreshToken)
     return {accessToken,refreshToken}
 }
-const registration = async (obj,roles)=>{
-
-    // insert to user table
-    const create_user = await User.create(obj)
-    
-    const dbroles = []
-    roles.forEach((r_id)=>{
-        dbroles.push({
-            username:obj.username,
-            role_id:r_id
-        })
-    })
-    // insert record to user_roles
-    await UserRole.bulkCreate(dbroles)
+const saveRefreshToken = async (username,refreshTokenString)=>{
+    await UserRefreshToken.create({username: username,refresh_token:refreshTokenString});
 }
+const registration = async (obj,provider_id)=>{
+    if(provider_id != 0) // 3rd party auth provider 
+    {
+        obj.is_email_verified = 1
+    }else
+    {
+        const hashedPassword = await bcrypt.hash(password,10);
+        obj.password         = hashedPassword
+    }
+
+    const {role,username} = obj;
+    
+    let user_role = [];
+    role.map((rl)=>{
+        user_role.push({username,role_id:rl})
+    })
+    delete obj.role; // delete the role key from obj before inserting
+    // ==== Start Database Transaction
+    const transactionHandler = await db.sequelize.transaction();
+    try{
+            await UserRole.bulkCreate(user_role,{transaction:transactionHandler}) // save user role
+            await User.create(obj,{transaction:transactionHandler}) // save user record to user table
+            await transactionHandler.commit()
+           return true;
+    }
+    catch(e){
+        await transactionHandler.rollback()
+        return false;
+    }
+}
+
 const setRefreshTokenCookie = (refreshToken,res)=>{
     res.cookie('jwt',refreshToken, {
         httpOnly:true,maxAge:24 * 60 * 60 * 1000,samesite:'None',secure:true
     });
 }
+
 module.exports = {
     login,
     loginWithProvider

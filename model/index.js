@@ -27,4 +27,7 @@ models.ProductTag           = require('./product_tags')(sequelize,Sequelize.Data
 models.Brand                = require('./brand')(sequelize,Sequelize.DataTypes);
 models.AuthProvider         = require('./auth_provider')(sequelize,Sequelize.DataTypes);
 
+models.UserRole.hasMany(models.Role);
+models.Role.belongsTo(models.UserRole);
+
 module.exports = {db,models};
