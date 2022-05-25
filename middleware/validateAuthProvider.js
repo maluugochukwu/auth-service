@@ -24,6 +24,7 @@ const validateAuthProvider = async (req,res,next)=>{
                 if(payload.aud == CLIENT_ID)
                 {
                     res.locals.payload = payload
+                    // check the provider id of the user on the db, if it matches the provider id passed
                     next()
                 }else
                 {

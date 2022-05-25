@@ -8,14 +8,18 @@ const auth = require('../controller/auth');
 // login with username and password
 router.post('/',authMiddleware,auth.login)
 
-// login with 3rd party auth provider
-router.post('/:provider',authProviderMiddleware,auth.loginWithProvider)
+// login or register with 3rd party auth provider
+router.post('/:provider',authProviderMiddleware,auth.providerAuth)
 
 // register with username, password, and other details
-router.post('/register',authRegistration,auth.login)
+router.post('/register',authRegistration,auth.register)
 
-// register with 3rd party auth provider
-router.post('/register/:provider',authProviderMiddleware,auth.login)
+
+// // Admin registers a user  with username, password, AND ROLE attribute
+router.post('/registerUser',authRegistration,auth.register)
+
+
+
 
 
 

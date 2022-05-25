@@ -34,6 +34,12 @@ module.exports = (sequelize,DataTypes)=>{
             type:DataTypes.CHAR(1),
             defaultValue:0
         },
+        email_verification_code:{
+            type:DataTypes.STRING(10)
+        },
+        email_verification_expire:{
+            type:DataTypes.DATE
+        },
     },
     {
         freezeTableName:true
