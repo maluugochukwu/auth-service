@@ -194,7 +194,9 @@ const setRefreshTokenCookie = (refreshToken,res)=>{
         httpOnly:true,maxAge:24 * 60 * 60 * 1000,samesite:'None',secure:true
     });
 }
-
+const changePassword = ()=>{
+    
+}
 module.exports = {
     login,
     providerAuth,
