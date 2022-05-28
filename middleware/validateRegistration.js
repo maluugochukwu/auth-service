@@ -17,23 +17,12 @@ const validateRegistration = async (req,res,next)=>{
             errmessg2.push(msg)
         }
        return res.status(400).json({ errors: errmessg2 });
+    }else
+    {
+        next()
     }
 
-    const {username,password} = req.body;
-    // check if username exist in database
-    User.findAll({
-        where:{
-            username: username
-        }
-    }).then((items)=>{
-        if(items.length !== 0){
-            res.status(409).json({message:"Record already exist"})
-        }else
-        {
-            next();
-        }
-        
-    })
+    
 }
 
 module.exports = [schemaRule,validateRegistration];

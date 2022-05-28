@@ -194,11 +194,13 @@ const setRefreshTokenCookie = (refreshToken,res)=>{
         httpOnly:true,maxAge:24 * 60 * 60 * 1000,samesite:'None',secure:true
     });
 }
-const changePassword = ()=>{
+const changePassword = (req,res)=>{
+    // update password of username 
     
 }
 module.exports = {
     login,
     providerAuth,
-    register
+    register,
+    changePassword
 };

@@ -19,31 +19,10 @@ const validateAuth = async (req,res,next)=>{
         }
        return res.status(400).json({ errors: errmessg2 });
     }
-
-    const {username,password} = req.body;
-    // check if username exist in database
-    User.findAll({
-        where:{
-            username: username
-        }
-    }).then(async (items)=>{
-        if(items.length !== 0){
-            const hashedPassword = items[0].password;
-            const match = await bcrypt.compare(password,hashedPassword);
-            if(match)
-            {
-                next()
-            }
-            else
-            {
-                res.status(409).json({message:"username or password is incorrect"})
-            }
-        }else
-        {
-            res.status(409).json({message:"username or password is incorrect"})
-        }
-        
-    })
+    else
+    {
+        next()
+    }
 }
 
 
