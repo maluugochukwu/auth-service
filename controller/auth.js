@@ -1,9 +1,12 @@
 const { models: {UserRefreshToken,User,UserRole,Role},db }  = require('../model');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer')
+const crypto = require('crypto');
+const bcrypt = require('bcrypt'); 
 require('dotenv').config();
 
 const login = async (req,res)=>{
+    console.log(req.originalUrl);
     const {username} = req.body;
     const tokens = await issueToken(username)
     //save refreshToken to db for the user
@@ -68,6 +71,7 @@ const register              = async (req,res)=>{
     const provider_id = 0
     const obj = {
         username:req.body.username,
+        password:req.body.password,
         email:req.body.email,
         role:[
             process.env.DEFAULT_USER_ROLE
@@ -77,20 +81,30 @@ const register              = async (req,res)=>{
         profile_photo:req.body.profile_photo,
         provider_id:provider_id,
     }
-    const status = registration(obj,provider_id)
-    if(status)
-    {
-        res.json({
-            responseCode:0,
-            responseMessage:"Registration successful"
-        })
-    }else
-    {
+    registration(obj,provider_id).then((ss) => {
+        if(ss)
+        {
+            res.json({
+                responseCode:0,
+                responseMessage:"Registration successful"
+            })
+        }else
+        {
+            res.json({
+                responseCode:34,
+                responseMessage:"Registration failed"
+            })
+        }
+        
+    }).catch(err => {
+        console.log(err)
         res.json({
             responseCode:34,
             responseMessage:"Registration failed"
         })
-    }
+    })
+
+    
 }
 const issueToken = async username =>{
     const [results, metadata] = await db.sequelize.query(`SELECT username, user_role.role_id as u_role, role_name FROM user_role INNER JOIN role ON user_role.role_id = role.role_id WHERE username = '${username}'`)
@@ -103,7 +117,7 @@ const issueToken = async username =>{
             role:userRoles
         },
         process.env.ACCESS_TOKEN_SECRET,
-        {expiresIn:'60s'}
+        {expiresIn:'600s'}
     );
     const refreshToken = jwt.sign(
         {
@@ -125,8 +139,10 @@ const registration = async (obj,provider_id)=>{
         obj.is_email_verified = 1
     }else
     {
+        const password = obj.password
         const hashedPassword = await bcrypt.hash(password,10);
         obj.password         = hashedPassword
+        // console.log(await bcrypt.compare(password,hashedPassword))
     }
 
     const {role,username} = obj;
@@ -138,10 +154,12 @@ const registration = async (obj,provider_id)=>{
     delete obj.role; // delete the role key from obj before inserting
     // ==== Start Database Transaction
     const transactionHandler = await db.sequelize.transaction();
+    
     try{
+        
             await UserRole.bulkCreate(user_role,{transaction:transactionHandler}) // save user role
             await User.create(obj,{transaction:transactionHandler}) // save user record to user table
-            await transactionHandler.commit()
+             await transactionHandler.commit()
             if(provider_id == 0)
             {
                 const message = {
@@ -149,7 +167,7 @@ const registration = async (obj,provider_id)=>{
                     subject: "Verify your email",
                     text: `Hello ${obj.firstname} ${obj.lastname},\n Use this code ${generateVerificationCode()} to verify your email`
                 }
-                sendEmail(message)
+                // sendEmail(message)
             }
            return true;
     }
@@ -171,10 +189,10 @@ const sendEmail = (message)=>{
       
    transport.sendMail(message, function(err, info) {
         if (err) {
-          console.log(err)
+        //   console.log(err)
           return false
         } else {
-          console.log(info);
+        //   console.log(info);
           return true
         }
     })
@@ -194,13 +212,59 @@ const setRefreshTokenCookie = (refreshToken,res)=>{
         httpOnly:true,maxAge:24 * 60 * 60 * 1000,samesite:'None',secure:true
     });
 }
-const changePassword = (req,res)=>{
-    // update password of username 
+
+const forgotPassword = async (req,res)=>{
+    // send a link to the user's email to change his password
+    const username = req.params.username
+    const code = crypto.randomBytes(64).toString('hex')
+    const currentDate = new Date()
+    const expireDate = currentDate.setDate(currentDate.getDate() + 1)
+    // console.log(code)
+    User.update({forgotPasswordLink:code,forgotPasswordLinkExpire:expireDate},{where:{username:username}})
+    .then((result)=>{
+        console.log(result)
+        if(result[0] == 1)
+        {
+            // send email notification
+            res.json({responseCode:0,responseMessage:"Check your email for a link to update set your password"})
+        }else
+        {
+            res.json({responseCode:31,responseMessage:"Username is incorrect"})
+        }
+    })
+    .catch((error)=>{
+        res.json({responseCode:31,responseMessage:"Username not found"})
+    })
+}
+const setPasswordWithLink = async (req,res)=>{
+    const code           = req.body.code
+    const password      = req.body.password
+    const hashedPassword = await bcrypt.hash(password,10);
+    const [results, metadata] = await db.sequelize.query(`SELECT username FROM user WHERE forgotPasswordLinkExpire > NOW() AND forgotPasswordLink = '${code}'`);
+    if(results.length > 0)
+    {
+        User.update({password:hashedPassword,forgotPasswordLink:null},{where: {forgotPasswordLink:code}})
+        .then((result) => {
+            if(result)
+            {
+                res.json({responseCode:0,responseMessage:"Password set successfully"})
+            }else
+            {
+                res.json({responseCode:76,responseMessage:"Unable to set password"})
+            }
+        })
+        .catch(err => res.json({responseCode:72,responseMessage:"Unable to set password"}))
+    }else{
+        res.json({responseCode:6,responseMessage:"Expired or invalid reset link"})
+    }
     
 }
+
+
 module.exports = {
     login,
     providerAuth,
     register,
-    changePassword
+    forgotPassword,
+    setPasswordWithLink
 };

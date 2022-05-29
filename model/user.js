@@ -40,6 +40,12 @@ module.exports = (sequelize,DataTypes)=>{
         email_verification_expire:{
             type:DataTypes.DATE
         },
+        forgotPasswordLink:{
+            type:DataTypes.STRING(250),
+        },
+        forgotPasswordLinkExpire:{
+            type:DataTypes.DATE
+        },
     },
     {
         freezeTableName:true

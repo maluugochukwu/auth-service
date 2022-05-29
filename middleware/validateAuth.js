@@ -21,6 +21,8 @@ const validateAuth = async (req,res,next)=>{
     }
     else
     {
+
+        // res.locals.payload = {username:req.body.username,password:req.body.password}
         next()
     }
 }
