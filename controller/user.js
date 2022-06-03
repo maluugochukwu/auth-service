@@ -105,11 +105,19 @@ const editProfile = async (req, res) => {
         res.json({responseCode:11,responseMessage:"Could not update profile"})
     }
 }
+const addAddress = async (req,res)=>{
+    const username = res.locals.payload.username
+    
+    res.json({
+
+    })
+}
 
 
 
 module.exports = {
     createUser,
     changePassword,
-    editProfile
+    editProfile,
+    addAddress
 };

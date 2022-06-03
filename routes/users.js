@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 verifyJwt = require('../middleware/verifyJwt');
-const userController          = require('../controller/user')
+const userController         = require('../controller/user')
 const usernameCheck          = require('../middleware/checkUsernamePassword')
 
 
@@ -11,9 +11,7 @@ router.get('/',verifyJwt, function(req, res) {
 })
 
 // user want to edit his profile
-router.put('/',verifyJwt, userController.editProfile,function(req, res) {
-    res.json({"message":req.body.username});
-})
+router.put('/',verifyJwt, userController.editProfile)
 
 // user want to add address
 router.put('/address',verifyJwt, userController.editProfile,function(req, res) {

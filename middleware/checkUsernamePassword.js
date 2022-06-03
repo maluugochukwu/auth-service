@@ -3,12 +3,12 @@ const bcrypt = require('bcrypt');
 
 const loginCredentialsCheck = async (req,res,next)=>{
     
-    const url = req.originalUrl
+    const url   = req.originalUrl
     let payload = ""
     if(url == "/user/changePassword")
     {
         const username = res.locals.payload.username
-        payload = {username,password:req.body.password}
+        payload        = {username,password:req.body.password}
     }else
     {
         payload = req.body
