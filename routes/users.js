@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 verifyJwt = require('../middleware/verifyJwt');
 const userController         = require('../controller/user')
+const addressController         = require('../controller/address')
 const usernameCheck          = require('../middleware/checkUsernamePassword')
+const midlleware          = require('../middleware/validate_user_action')
 
 
 // user want to get his profile
@@ -14,14 +16,10 @@ router.get('/',verifyJwt, function(req, res) {
 router.put('/',verifyJwt, userController.editProfile)
 
 // user want to add address
-router.put('/address',verifyJwt, userController.editProfile,function(req, res) {
-    res.json({"message":req.body.username});
-})
+router.put('/address',verifyJwt, midlleware.validateAddress,addressController.createAddress)
 
 // user want to get info of all address
-router.get('/address',verifyJwt, userController.editProfile,function(req, res) {
-    res.json({"message":req.body.username});
-})
+router.get('/address',verifyJwt, userController.editProfile)
 // user want to get info of an address
 router.get('/address/:address_id',verifyJwt, userController.editProfile,function(req, res) {
     res.json({"message":req.body.username});
@@ -40,12 +38,12 @@ router.put('/address/primary/:address_id',verifyJwt, userController.editProfile,
 router.get('/coupon',verifyJwt, userController.editProfile,function(req, res) {
     res.json({"message":req.body.username});
 })
-// user want to see all his saved items
-router.get('/saveditems',verifyJwt, userController.editProfile,function(req, res) {
+// user want to see all his saved wish
+router.get('/wishList',verifyJwt, userController.editProfile,function(req, res) {
     res.json({"message":req.body.username});
 })
 // user want to see all his saved items
-router.post('/wishList',verifyJwt, userController.editProfile,function(req, res) {
+router.delete('/wishList/:id',verifyJwt, userController.editProfile,function(req, res) {
     res.json({"message":req.body.username});
 })
 // user want to see all his saved items

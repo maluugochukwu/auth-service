@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 
 // Data validation RULES --------------------------------
 const schemaRule = [
-    body("username").isEmail().withMessage({code:78,message:"Username must be a valid email"}),
+    body("username").notEmpty().withMessage({code:78,message:"Username must be a valid email"}),
     body("password",{code:14,message:"Password is required"}).not().isEmpty().trim()
 ]
 // ------
