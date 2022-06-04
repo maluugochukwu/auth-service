@@ -19,20 +19,17 @@ router.put('/',verifyJwt, userController.editProfile)
 router.put('/address',verifyJwt, midlleware.validateAddress,addressController.createAddress)
 
 // user want to get info of all address
-router.get('/address',verifyJwt, userController.editProfile)
+router.get('/address',verifyJwt, addressController.getAddress)
+
 // user want to get info of an address
-router.get('/address/:address_id',verifyJwt, userController.editProfile,function(req, res) {
-    res.json({"message":req.body.username});
-})
+// router.get('/address/:address_id',verifyJwt, userController.editProfile,function(req, res) {
+//     res.json({"message":req.body.username});
+// })
 
 // user want to delete an address
-router.delete('/address/:address_id',verifyJwt, userController.editProfile,function(req, res) {
-    res.json({"message":req.body.username});
-})
-// user want to make an address the primary address
-router.put('/address/primary/:address_id',verifyJwt, userController.editProfile,function(req, res) {
-    res.json({"message":req.body.username});
-})
+router.delete('/address/:address_id',verifyJwt, addressController.deleteAddress)
+// user want to edit address
+router.post('/address/:address_id',verifyJwt, addressController.editAddress)
 
 // user want to see all his coupon
 router.get('/coupon',verifyJwt, userController.editProfile,function(req, res) {
