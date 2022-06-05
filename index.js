@@ -45,6 +45,10 @@ app.use('/product',require('./routes/product'));
 app.use('/tag',require('./routes/tag'));
 
 
+// route for cart
+app.use('/cart',require('./routes/cart'));
+
+
 
 app.post('/kido/:passid', (req, res) => {
     res.send(req.params.passid);
