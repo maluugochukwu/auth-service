@@ -1,4 +1,4 @@
-const { models: {User,UserRole,Product,Option},db }  = require('../model');
+const { models: {User,UserRole,Product,Option,Order},db }  = require('../model');
 const bcrypt = require('bcrypt'); 
 const orderid = require('order-id')('key'); 
 const createUser              = async (req,res)=>{
@@ -130,9 +130,9 @@ const checkout = async (req,res)=>{
     for(let x=0; x < products.length; x++) {
         let product = products[x];
         let product_id = product.id
-        let product_price = product.price
+        
         let product_quantity = product.quantity
-        let netPrice = product_price
+        
         const dbresult = await Product.findAll({
             where:{
                 id:product_id
@@ -142,20 +142,22 @@ const checkout = async (req,res)=>{
         {
             const result = dbresult[0]
             let product_name = result.name;
+            let product_price = parseInt(result.price)
+            let netPrice = product_price
             let product_description = result.description;
             if(product_quantity < 1) return res.json({responseCode:58,responseMessage:`Enter a quantity for this product (${product_name})`})
             if(producthasOption(product_id) && product.optionId == null) return res.json({responseCode:58,responseMessage:`Kindly pick a variant for this product (${product_name})`})
             //check if the option id is valid
-            if(product.optionId) return false
+            // if(product.optionId) return false
 
-            let discount = result.discount
+            let discount = parseInt(result.discount)
             let optionCharge = 0
             if(product.optionId != null)
             {
-                optionCharge = getOptionCharge(product.optionId)
+                optionCharge = parseInt(getOptionCharge(product.optionId))
                 netPrice = netPrice + optionCharge
             }
-            netPrice = netPrice - (discount/100 * netPrice)
+            netPrice = (netPrice - (discount/100 * netPrice)) * product_quantity
             totalPrice += netPrice
 
             const deliveryAddress = geUserDeliveryAddress(username)
@@ -183,8 +185,11 @@ const checkout = async (req,res)=>{
                 delivery_town:deliveryAddress.town,
             })
            products[x].optionCharge = optionCharge
-           products[x].price = product_price
-           products[x].discount = product_price
+           products[x].unitPrice = product_price
+           products[x].unitPriceWithCharges = product_price + optionCharge
+           
+           products[x].quantityPrice = (product_price + optionCharge) * product_quantity
+           products[x].discount = discount
            products[x].netPrice = netPrice
         }else
         {
@@ -197,9 +202,9 @@ const checkout = async (req,res)=>{
     return res.json({responseCode:0,responseMessage:"Order logged",data:output})
 }
 const producthasOption = product_id =>{
-    return false;
+    return true;
 }
-const getOptionDetails = (id) =>{
+const getOptionDetails = async(id) =>{
     await Option.find({
 
     })

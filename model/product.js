@@ -11,6 +11,10 @@ module.exports = (sequelize,DataTypes)=>{
         weight:{
             type:DataTypes.DECIMAL(10,2)
         },
+        discount:{
+            type:DataTypes.DECIMAL(10,2),
+            defaultValue:0
+        },
         category_id:{
             type:DataTypes.INTEGER
         },

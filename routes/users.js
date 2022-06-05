@@ -44,9 +44,9 @@ router.delete('/wishList/:id',verifyJwt, userController.editProfile,function(req
     res.json({"message":req.body.username});
 })
 // user want to see all his saved items
-router.post('/checkout',verifyJwt, userController.editProfile,function(req, res) {
-    res.json({"message":req.body.username});
-})
+router.post('/checkout',verifyJwt, userController.checkout)
+
+
 // user want to initialize payment
 router.post('/initPayment',verifyJwt, userController.editProfile,function(req, res) {
     res.json({"message":req.body.username});
