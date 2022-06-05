@@ -1,4 +1,4 @@
-const { models: {User,UserRole,Product},db }  = require('../model');
+const { models: {User,UserRole,Product,Option},db }  = require('../model');
 const bcrypt = require('bcrypt'); 
 const orderid = require('order-id')('key'); 
 const createUser              = async (req,res)=>{
@@ -146,7 +146,8 @@ const checkout = async (req,res)=>{
             if(product_quantity < 1) return res.json({responseCode:58,responseMessage:`Enter a quantity for this product (${product_name})`})
             if(producthasOption(product_id) && product.optionId == null) return res.json({responseCode:58,responseMessage:`Kindly pick a variant for this product (${product_name})`})
             //check if the option id is valid
-            
+            if(product.optionId) return false
+
             let discount = result.discount
             let optionCharge = 0
             if(product.optionId != null)
@@ -192,11 +193,16 @@ const checkout = async (req,res)=>{
         
     }
         
-  const output = {products,shipping:0,tax:0,total:totalPrice}
+    const output = {products,shipping:0,tax:0,total:totalPrice}
     return res.json({responseCode:0,responseMessage:"Order logged",data:output})
 }
 const producthasOption = product_id =>{
     return false;
+}
+const getOptionDetails = (id) =>{
+    await Option.find({
+
+    })
 }
 const getOptionCharge = optionId =>{
     return -15;

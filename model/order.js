@@ -10,17 +10,31 @@ module.exports = (sequelize,DataTypes)=>{
             type:DataTypes.STRING(150),
             allowNull:false
         },
+        product_description:{
+            type:DataTypes.TEXT,
+            allowNull:false
+        },
+        product_image:{
+            type:DataTypes.TEXT,
+            allowNull:false
+        },
         product_name:{
             type:DataTypes.STRING(150)
         },
-        total_price:{
+        net_price:{
             type:DataTypes.DECIMAL(10,2)
         },
         shipping_fee:{
             type:DataTypes.DECIMAL(10,2)
         },
-        package_id:{
+        payment_id:{
             type:DataTypes.STRING(200)
+        },
+        discount:{
+            type:DataTypes.STRING(50)
+        },
+        option_charge:{
+            type:DataTypes.STRING(50)
         },
         tracking_number:{
             type:DataTypes.STRING(200)
