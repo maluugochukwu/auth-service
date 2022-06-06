@@ -117,7 +117,7 @@ const issueToken = async username =>{
             role:userRoles
         },
         process.env.ACCESS_TOKEN_SECRET,
-        {expiresIn:'600s'}
+        {expiresIn:'6000s'}
     );
     const refreshToken = jwt.sign(
         {

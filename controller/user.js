@@ -1,4 +1,4 @@
-const { models: {User,UserRole,Product,Option,Order},db }  = require('../model');
+const { models: {User,UserRole,Product,Option,Order,ProductOption},db }  = require('../model');
 const bcrypt = require('bcrypt'); 
 const orderid = require('order-id')('key'); 
 const createUser              = async (req,res)=>{
@@ -68,7 +68,7 @@ const registration = async (obj,provider_id)=>{
 }
 const changePassword = async (req,res)=>{
     // update password of username 
-    console.log(res.locals.payload)
+    // console.log(res.locals.payload)
     const {newPassword,password} = req.body;
     const {username} = res.locals.payload
     const hashedPassword = await bcrypt.hash(newPassword,10);
@@ -106,15 +106,26 @@ const editProfile = async (req, res) => {
         res.json({responseCode:11,responseMessage:"Could not update profile"})
     }
 }
-const addAddress = async (req,res)=>{
-    const username = res.locals.payload.username
+const findDuplicates = (array)=>{
+    const r = []
+    array.reduce((total,amount)=>{
+        r.push(amount.id)
+        return amount.id
+    },0)
+    var valuesSoFar = Object.create(null);
+    for (var i = 0; i < r.length; ++i) {
+        var value = r[i];
+        if (value in valuesSoFar) {
+            return true;
+        }
+        valuesSoFar[value] = true;
+    }
+    return false;
     
-    res.json({
-
-    })
 }
 const checkout = async (req,res)=>{
-
+    
+    
     // const cartStructure = {
     //     products:[
     //         {
@@ -124,8 +135,11 @@ const checkout = async (req,res)=>{
     //         }
     //     ]
     // }
+    if(findDuplicates(req.body.products)) return res.json({responseCode:41,responseMessage:"Product ID on each object must be unique"})
     const products = req.body.products
     const username = res.locals.payload.username
+    const payment_id = generatePaymentId();
+    const orderObj = []
     let totalPrice = 0;
     for(let x=0; x < products.length; x++) {
         let product = products[x];
@@ -145,16 +159,19 @@ const checkout = async (req,res)=>{
             let product_price = parseInt(result.price)
             let netPrice = product_price
             let product_description = result.description;
+            let product_image = result.img;
             if(product_quantity < 1) return res.json({responseCode:58,responseMessage:`Enter a quantity for this product (${product_name})`})
-            if(producthasOption(product_id) && product.optionId == null) return res.json({responseCode:58,responseMessage:`Kindly pick a variant for this product (${product_name})`})
-            //check if the option id is valid
-            // if(product.optionId) return false
+            let hasOption = await producthasOption(product_id)
+            let isProductOptionCorrect = await isProductOptionValid(product.optionId,product_id)
+            if(hasOption && product.optionId == null) return res.json({responseCode:58,responseMessage:`Kindly pick a variant for this product (${product_name})`})
+            //check if the option id is valid for the product
+            if(!isProductOptionCorrect) return res.json({responseCode:51,responseMessage:`This product (${product_name}) has an invalid option id`})
 
             let discount = parseInt(result.discount)
             let optionCharge = 0
             if(product.optionId != null)
             {
-                optionCharge = parseInt(getOptionCharge(product.optionId))
+                optionCharge = parseInt(await getOptionCharge(product.optionId))
                 netPrice = netPrice + optionCharge
             }
             netPrice = (netPrice - (discount/100 * netPrice)) * product_quantity
@@ -163,15 +180,15 @@ const checkout = async (req,res)=>{
             const deliveryAddress = geUserDeliveryAddress(username)
             if(deliveryAddress == null) return res.json({responseCode:118,responseMessage:"Could not find a primary address"})
             const o_id = orderid.generate();
-            await Order.create({
+            orderObj.push( {
                 order_id:o_id,
                 product_id:product_id,
                 product_name:product_name,
                 product_description:product_description,
-                product_image:"",
+                product_image:product_image,
                 net_price:netPrice,
-                shipping_fee:"",
-                payment_id:"",
+                shipping_fee:10,
+                payment_id:payment_id,
                 tracking_number:"",
                 discount:`${discount}%`,
                 option_charge:optionCharge,
@@ -184,6 +201,7 @@ const checkout = async (req,res)=>{
                 delivery_lga:deliveryAddress.lga,
                 delivery_town:deliveryAddress.town,
             })
+           
            products[x].optionCharge = optionCharge
            products[x].unitPrice = product_price
            products[x].unitPriceWithCharges = product_price + optionCharge
@@ -193,30 +211,72 @@ const checkout = async (req,res)=>{
            products[x].netPrice = netPrice
         }else
         {
-            return res.json({responseCode:58,responseMessage:`An object has an invalid product id (${product_id})`})
+           return res.json({responseCode:58,responseMessage:`An object has an invalid product id (${product_id})`})
         }
         
     }
-        
+    await Order.bulkCreate(orderObj)
     const output = {products,shipping:0,tax:0,total:totalPrice}
     return res.json({responseCode:0,responseMessage:"Order logged",data:output})
 }
-const producthasOption = product_id =>{
-    return true;
+const producthasOption = async product_id =>{
+    const dbresult = await ProductOption.findAll({
+        where:{
+            product_id
+        }
+    })
+    if(dbresult.length > 0)
+    {
+        
+        return true;
+    }else
+    {
+        return false;
+    }
+    
 }
 const getOptionDetails = async(id) =>{
     await Option.find({
 
     })
 }
-const getOptionCharge = optionId =>{
-    return -15;
+const getOptionCharge = async optionId =>{
+    const dbresult = await ProductOption.findAll({
+        where:{
+            id:optionId,
+        }
+    })
+    // console.log(dbresult)
+    if(dbresult.length > 0)
+    {
+        
+        return dbresult[0].charge;
+    }
 }
-const createOrder = product =>{
-    return true;
+const isProductOptionValid = async (optionId,product_id) =>{
+    const dbresult = await ProductOption.findAll({
+        where:{
+            id:optionId,
+            product_id
+        }
+    })
+    // console.log(dbresult)
+    if(dbresult.length > 0)
+    {
+        
+        return true;
+    }else
+    {
+        return false;
+    }
 }
 const generatePaymentId = (amount) =>{
-    return 448655665;
+    const start = new Date(2012, 0, 1);
+    const end = new Date()
+    let time = Date.now() + Math.random()
+    // time = time.replace(".",7)
+    console.log(time)
+    return time;
 }
 const geUserDeliveryAddress = (username) =>{
     // get the user's primary address user_address, if there are no primary address return null
@@ -233,6 +293,5 @@ module.exports = {
     createUser,
     changePassword,
     editProfile,
-    addAddress,
     checkout
 };

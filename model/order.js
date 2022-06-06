@@ -38,6 +38,18 @@ module.exports = (sequelize,DataTypes)=>{
         },
         tracking_number:{
             type:DataTypes.STRING(200)
+        },
+        delivery_address:{
+            type:DataTypes.STRING(200)
+        },
+        delivery_state:{
+            type:DataTypes.STRING(200)
+        },
+        delivery_lga:{
+            type:DataTypes.STRING(200)
+        },
+        delivery_town:{
+            type:DataTypes.STRING(200)
         }
     },
     {
