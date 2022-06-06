@@ -163,9 +163,11 @@ const checkout = async (req,res)=>{
             if(product_quantity < 1) return res.json({responseCode:58,responseMessage:`Enter a quantity for this product (${product_name})`})
             let hasOption = await producthasOption(product_id)
             let isProductOptionCorrect = await isProductOptionValid(product.optionId,product_id)
+
             if(hasOption && product.optionId == null) return res.json({responseCode:58,responseMessage:`Kindly pick a variant for this product (${product_name})`})
+            
             //check if the option id is valid for the product
-            if(!isProductOptionCorrect) return res.json({responseCode:51,responseMessage:`This product (${product_name}) has an invalid option id`})
+            if(!isProductOptionCorrect && product.optionId != null ) return res.json({responseCode:51,responseMessage:`This product (${product_name}) has an invalid option id`})
 
             let discount = parseInt(result.discount)
             let optionCharge = 0
@@ -216,7 +218,7 @@ const checkout = async (req,res)=>{
         
     }
     await Order.bulkCreate(orderObj)
-    const output = {products,shipping:0,tax:0,total:totalPrice}
+    const output = {products,shipping:0,tax:0,total:totalPrice,paymentId:payment_id}
     return res.json({responseCode:0,responseMessage:"Order logged",data:output})
 }
 const producthasOption = async product_id =>{
