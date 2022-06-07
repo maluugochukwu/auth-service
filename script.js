@@ -1,0 +1,1 @@
+// select options_group.name as option_name, option.name as names, product_option.options_id as options_id FROM options_group INNER JOIN option ON options_group.id = option.options_group_id LEFT JOIN product_option ON  product_option.options_id = options_group.id
