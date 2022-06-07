@@ -1,0 +1,45 @@
+module.exports = (sequelize,DataTypes)=>{
+    const Transaction = sequelize.define('transaction',
+    {
+        transaction_id:{
+            type:DataTypes.STRING(150),
+            allowNull:false,
+            primaryKey:true
+        },
+        source_acct:{
+            type:DataTypes.STRING(150)
+        },
+        destination_acct:{
+            type:DataTypes.STRING(150)
+        },
+        transaction_desc:{
+            type:DataTypes.TEXT
+        },
+        transaction_amount:{
+            type:DataTypes.DECIMAL(10,5)
+        },
+        response_code:{
+            type:DataTypes.STRING(5)
+        },
+        response_message:{
+            type:DataTypes.STRING(200)
+        },
+        payment_mode:{
+            type:DataTypes.STRING(150)
+        },
+        posted_ip:{
+            type:DataTypes.STRING(150)
+        },
+        reference_trans_id:{
+            type:DataTypes.STRING(150)
+        },
+        user_id:{
+            type:DataTypes.STRING(150)
+        },
+    },
+    {
+        freezeTableName:true
+    }
+    )
+    return Transaction;
+}

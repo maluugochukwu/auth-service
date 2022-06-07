@@ -73,6 +73,16 @@ const searchProduct = async (req,res) => {
     const [results, metadata] = await db.sequelize.query(`SELECT * FROM product INNER JOIN product_category ON product.category_id = product_category.id INNER JOIN product_tag ON product.id = product_tag.product_id  WHERE product_tag.tagname LIKE '%${query}%' OR product.name LIKE '%${query}%' `);
     res.json({responseCode:0,responseMessage:"OK",data:{product:results}});
 }
+const getProductDetails = async (req,res)=>{
+    // get the products and option details
+    // such as brand
+    const product_id = req.params.product_id;
+    const [products_item, metadata] = await db.sequelize.query(`SELECT * FROM product INNER JOIN product_category ON product.category_id = product_category.id  WHERE product.id = '${product_id}' `);
+    if(products_item.length < 1) return res.json({responseCode:68,responseMessage:"No product matches the ID"})
+
+    const [options, metadata_options] = await db.sequelize.query(`SELECT * FROM product INNER JOIN product_category ON product.category_id = product_category.id  WHERE product.id = '${product_id}' `);
+    res.json({responseCode:0,responseMessage:"OK",data:{product:results}});
+}
 const getProductShowcase = async (req,res)=>{
     const showcase = await getActiveShowcase();
     const output = [];
@@ -104,5 +114,6 @@ module.exports = {
     addProduct,
     editProduct,
     deleteProduct,
-    searchProduct
+    searchProduct,
+    getProductDetails
 };

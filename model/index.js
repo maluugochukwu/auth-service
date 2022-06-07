@@ -27,6 +27,7 @@ models.ProductTag           = require('./product_tags')(sequelize,Sequelize.Data
 models.Brand                = require('./brand')(sequelize,Sequelize.DataTypes);
 models.AuthProvider         = require('./auth_provider')(sequelize,Sequelize.DataTypes);
 models.UserAddress         = require('./user_address')(sequelize,Sequelize.DataTypes);
+models.Transaction         = require('./transaction')(sequelize,Sequelize.DataTypes);
 
 
 

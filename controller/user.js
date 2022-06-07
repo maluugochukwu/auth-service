@@ -1,4 +1,4 @@
-const { models: {User,UserRole,Product,Option,Order,ProductOption},db }  = require('../model');
+const { models: {User,UserRole,Product,Option,Order,ProductOption,Transaction},db }  = require('../model');
 const bcrypt = require('bcrypt'); 
 const orderid = require('order-id')('key'); 
 const createUser              = async (req,res)=>{
@@ -217,7 +217,21 @@ const checkout = async (req,res)=>{
         }
         
     }
-    await Order.bulkCreate(orderObj)
+    const transactionHandler = await db.sequelize.transaction()
+    await Order.bulkCreate(orderObj,{transaction:transactionHandler})
+    await Transaction.create({
+        transaction_id:payment_id,
+        source_acct:username,
+        destination_acct:"ECOMMERCE STORE ACCOUNT",
+        transaction_desc:"PAYMENT FOR GOODS",
+        transaction_amount:totalPrice,
+        response_code:99,
+        posted_ip:req.socket.remoteAddress,
+        response_message:"INITIALIZED",
+        reference_trans_id:"",
+        user_id:username
+    },{transaction:transactionHandler})
+    await transactionHandler.commit()
     const output = {products,shipping:0,tax:0,total:totalPrice,paymentId:payment_id}
     return res.json({responseCode:0,responseMessage:"Order logged",data:output})
 }
