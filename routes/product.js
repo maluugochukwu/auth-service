@@ -9,5 +9,5 @@ router.get('/category/:id', productController.getProductByCategory)
 router.put('/', productMiddleware,productController.addProduct)
 router.put('/:id', productMiddleware,productController.editProduct)
 router.get('/search/:query',productController.searchProduct)
-router.get('/details/:product_id',productController.searchProduct)
+router.get('/details/:product_id',productController.getProductDetails)
 module.exports = router;

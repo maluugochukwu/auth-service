@@ -25,7 +25,25 @@ const deleteTag = async (req,res)=>{
     }
 }
 const editTag = async (req,res)=>{
-   
+    const validKeys = ["tagName"];
+    for (var property in req.body) 
+    {
+        if(!validKeys.includes(property))
+        {
+            res.json({responseCode:91,responseMessage:`${property} is not a valid field`})
+            return
+        }
+    }
+    const newArr = {};
+    if(req.body.tagName) newArr.tagname = req.body.tagName
+    console.log(newArr)
+    try{
+        const result = await Role.update(newArr,{where:{tagname:req.body.tagName,product_id:req.params.id}})
+        res.json({responseCode:0,responseMessage:"Tag updated"})
+    }catch(er)
+    {
+        res.json({responseCode:11,responseMessage:"Could not update Tag"})
+    }
 }
 const getProductTag = async (req,res)=>{
 
