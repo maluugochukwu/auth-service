@@ -22,24 +22,13 @@ const deleteDepartment = async (req,res)=>{
     }
 }
 const editDepartment = async (req,res)=>{
-    const validKeys = ["tagName"];
-    for (var property in req.body) 
-    {
-        if(!validKeys.includes(property))
-        {
-            res.json({responseCode:91,responseMessage:`${property} is not a valid field`})
-            return
-        }
-    }
-    const newArr = {};
-    if(req.body.tagName) newArr.tagname = req.body.tagName
-    console.log(newArr)
+    const name = req.body.name
     try{
-        const result = await Role.update(newArr,{where:{tagname:req.body.tagName,product_id:req.params.id}})
-        res.json({responseCode:0,responseMessage:"Tag updated"})
+        const result = await Role.update(name,{where:{id:req.params.id}})
+        res.json({responseCode:0,responseMessage:"Department updated"})
     }catch(er)
     {
-        res.json({responseCode:11,responseMessage:"Could not update Tag"})
+        res.json({responseCode:11,responseMessage:"Could not update Department"})
     }
 }
 
