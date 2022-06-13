@@ -78,17 +78,41 @@ const getProductDetails = async (req,res)=>{
     // such as brand
     const product_id = req.params.product_id;
     const [products_item, metadata] = await db.sequelize.query(`SELECT * FROM product INNER JOIN product_category ON product.category_id = product_category.id  WHERE product.id = '${product_id}' `);
+    // console.log(products_item)
     if(products_item.length < 1) return res.json({responseCode:68,responseMessage:"No product matches the ID"})
-
-    const [options, metadata_options] = await db.sequelize.query(`SELECT * FROM product INNER JOIN product_category ON product.category_id = product_category.id  WHERE product.id = '${product_id}' `);
-    res.json({responseCode:0,responseMessage:"OK",data:{product:results}});
+    const op = await getProductOptions(product_id)
+    const dd = products_item[0]
+    dd.optionsObj = op
+    return res.json({responseCode:0,responseMessage:"ok",data:dd})
+    // const [options, metadata_options] = await db.sequelize.query(`SELECT * FROM product INNER JOIN product_category ON product.category_id = product_category.id  WHERE product.id = '${product_id}' `);
+    // res.json({responseCode:0,responseMessage:"OK",data:{product:results}});
 }
 const getProductOptions = async (product_id)=> {
-    const dbresult = await ProductOption.findAll({
-        where:{
-            product_id
-        }
-    })
+    const [products_item, metadata] = await db.sequelize.query(`SELECT product_option.options_group_id options_group_id,options_group.name as options_name, GROUP_CONCAT(options_id separator '/') as option_val , GROUP_CONCAT(option.name separator '/') as option_name FROM product_option INNER JOIN options_group ON product_option.options_group_id = options_group.id INNER JOIN option ON option.id = options_id  WHERE product_id = '${product_id}' GROUP BY product_option.options_group_id`);
+    const optionsArr = []
+    if(products_item.length > 0) {
+        // let pro = new Promise((resolve, reject) => {
+            products_item.forEach((val,index)=>{
+            let opt_id = val.option_val.split("/")
+            let opt_name = val.option_name.split("/")
+            let value = [];
+            opt_id.forEach((el,i)=>{
+                value.push({
+                    id:el,
+                    name:opt_name[i]
+                })
+            })
+            optionsArr.push({
+            id:val.options_group_id,
+            name:val.options_name,
+            values:value,
+            })
+        })
+        //     resolve(optionsArr)
+        // })
+        
+    }
+    return optionsArr;
 }
 const getProductShowcase = async (req,res)=>{
     const showcase = await getActiveShowcase();
@@ -112,8 +136,6 @@ const getActiveShowcase = async ()=>{
     const [results, metadata] = await db.sequelize.query("SELECT id,name FROM showcase");
     return results;
 }
-
-
 module.exports = {
     getProductShowcase,
     getProductByCategory,

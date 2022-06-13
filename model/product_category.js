@@ -3,6 +3,9 @@ module.exports = (sequelize,DataTypes)=>{
     {
         name:{
             type:DataTypes.STRING(150)
+        },
+        department_id:{
+            type:DataTypes.STRING(150)
         }
     },
     {

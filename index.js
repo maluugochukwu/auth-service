@@ -44,6 +44,9 @@ app.use('/product',require('./routes/product'));
 // route for tag
 app.use('/tag',require('./routes/tag'));
 
+// route for tag
+app.use('/department',require('./routes/department'));
+
 
 // route for cart
 // app.use('/cart',require('./routes/cart'));
