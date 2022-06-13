@@ -131,7 +131,10 @@ const checkout = async (req,res)=>{
     //         {
     //             id:87,
     //             quantity:5,
-    //             optionId:null
+    //             options:[
+    //                 [1,1], // option group id, option value id
+    //                 [2,1]
+    //             ]
     //         }
     //     ]
     // }
@@ -162,20 +165,29 @@ const checkout = async (req,res)=>{
             let product_image = result.img;
             if(product_quantity < 1) return res.json({responseCode:58,responseMessage:`Enter a quantity for this product (${product_name})`})
             let hasOption = await producthasOption(product_id)
-            let isProductOptionCorrect = await isProductOptionValid(product.optionId,product_id)
-
-            if(hasOption && product.optionId == null) return res.json({responseCode:58,responseMessage:`Kindly pick a variant for this product (${product_name})`})
+            if(hasOption && product.options.length == 0) return res.json({responseCode:58,responseMessage:`Kindly pick a variant for this product (${product_name})`})
             
-            //check if the option id is valid for the product
-            if(!isProductOptionCorrect && product.optionId != null ) return res.json({responseCode:51,responseMessage:`This product (${product_name}) has an invalid option id`})
+            let optionCharge = 0
+            if(hasOption)
+            {
+                const duplOptions = await isDuplicateOptionGroupAndSameOptionsCount(product_id, product.options)
+                if(duplOptions[0]) return res.json({responseCode:91,responseMessage:`${duplOptions[1]}`})
+                for(let x = 0; x< product.options.length; x++) {
+                    let isProductOptionCorrect = await isProductOptionValid(product.options[x][0],product.options[x][1],product_id)
+
+                    
+                    
+                    //check if the option id is valid for the product
+                    if(!isProductOptionCorrect) return res.json({responseCode:51,responseMessage:`This product (${product_name}) has either an invalid option group id or option value id`})
+                    optionCharge = parseInt(await getOptionCharge(product.options[x][0]))
+                    netPrice = netPrice + optionCharge
+                }
+            }
+            
+            
 
             let discount = parseInt(result.discount)
-            let optionCharge = 0
-            if(product.optionId != null)
-            {
-                optionCharge = parseInt(await getOptionCharge(product.optionId))
-                netPrice = netPrice + optionCharge
-            }
+            
             netPrice = (netPrice - (discount/100 * netPrice)) * product_quantity
             totalPrice += netPrice
 
@@ -194,7 +206,7 @@ const checkout = async (req,res)=>{
                 tracking_number:"",
                 discount:`${discount}%`,
                 option_charge:optionCharge,
-                option_id:product.optionId,
+                option_id:JSON.stringify(product.options),
                 quantity:product_quantity,
                 price:product_price,
                 user_id:username,
@@ -235,6 +247,7 @@ const checkout = async (req,res)=>{
     const output = {products,shipping:0,tax:0,total:totalPrice,paymentId:payment_id}
     return res.json({responseCode:0,responseMessage:"Order logged",data:output})
 }
+
 const producthasOption = async product_id =>{
     const dbresult = await ProductOption.findAll({
         where:{
@@ -256,6 +269,26 @@ const getOptionDetails = async(id) =>{
 
     })
 }
+const isDuplicateOptionGroupAndSameOptionsCount = async (product_id,optionsArr)=>{
+    const storage = []
+    for(let x=0; x<optionsArr.length; x++) {
+        storage.push(optionsArr[x][0])
+    }
+    // console.log(storage)
+    if(storage.length !== new Set(storage).size)
+    {
+        return [true,`Options group id for each option has to be unique`]
+    }
+    
+    const [dbresult, metadata] = await db.sequelize.query(`SELECT * FROM product_option  WHERE product_id = '${product_id}' GROUP BY options_group_id `);
+    if(dbresult.length != optionsArr.length)
+    {
+        return [true,`${dbresult.length} options are required for this product, you only choose ${optionsArr.length}`]
+    }else
+    {
+        return [false]
+    }
+}
 const getOptionCharge = async optionId =>{
     const dbresult = await ProductOption.findAll({
         where:{
@@ -269,10 +302,11 @@ const getOptionCharge = async optionId =>{
         return dbresult[0].charge;
     }
 }
-const isProductOptionValid = async (optionId,product_id) =>{
+const isProductOptionValid = async (optionGroupId,optionsID,product_id) =>{
     const dbresult = await ProductOption.findAll({
         where:{
-            id:optionId,
+            options_group_id:optionGroupId,
+            options_id:optionsID,
             product_id
         }
     })

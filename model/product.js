@@ -27,6 +27,9 @@ module.exports = (sequelize,DataTypes)=>{
         img:{
             type:DataTypes.STRING(220)
         },
+        sub_category:{
+            type:DataTypes.INTEGER
+        },
         has_variant:{
             type:DataTypes.CHAR(1)
         }

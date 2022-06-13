@@ -83,6 +83,13 @@ const getProductDetails = async (req,res)=>{
     const [options, metadata_options] = await db.sequelize.query(`SELECT * FROM product INNER JOIN product_category ON product.category_id = product_category.id  WHERE product.id = '${product_id}' `);
     res.json({responseCode:0,responseMessage:"OK",data:{product:results}});
 }
+const getProductOptions = async (product_id)=> {
+    const dbresult = await ProductOption.findAll({
+        where:{
+            product_id
+        }
+    })
+}
 const getProductShowcase = async (req,res)=>{
     const showcase = await getActiveShowcase();
     const output = [];
