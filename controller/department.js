@@ -32,7 +32,7 @@ const editDepartment = async (req,res)=>{
     }
 }
 const getDepartments = async (req, res) => {
-
+// select from department then loop through and query the category then loop and query the sub category
 }
 
 module.exports = {
