@@ -31,9 +31,13 @@ const editDepartment = async (req,res)=>{
         res.json({responseCode:11,responseMessage:"Could not update Department"})
     }
 }
+const getDepartments = async (req, res) => {
+
+}
 
 module.exports = {
     createDepartment,
     deleteDepartment,
-    editDepartment
+    editDepartment,
+    getDepartments
 };

@@ -8,8 +8,8 @@ const {db} = require("./model");
 
 // table models sync
 (async ()=>{
-  await db.sequelize.sync();  
-//   await db.sequelize.sync({ alter: true });  
+//   await db.sequelize.sync();  
+  await db.sequelize.sync({ alter: true });  
 })()
 //
 
@@ -44,8 +44,9 @@ app.use('/product',require('./routes/product'));
 // route for tag
 app.use('/tag',require('./routes/tag'));
 
-// route for tag
+// route for department
 app.use('/department',require('./routes/department'));
+
 
 
 // route for cart
