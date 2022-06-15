@@ -1,4 +1,4 @@
-const { models: {Department} }  = require('../model');
+const { models: {Department,ProductCategory,ProductSubCategory} }  = require('../model');
 const createDepartment = async (req,res)=>{
     const name = req.body.name
     const newArr = []
@@ -24,7 +24,7 @@ const deleteDepartment = async (req,res)=>{
 const editDepartment = async (req,res)=>{
     const name = req.body.name
     try{
-        const result = await Role.update(name,{where:{id:req.params.id}})
+        const result = await Department.update(name,{where:{id:req.params.id}})
         res.json({responseCode:0,responseMessage:"Department updated"})
     }catch(er)
     {
@@ -33,6 +33,50 @@ const editDepartment = async (req,res)=>{
 }
 const getDepartments = async (req, res) => {
 // select from department then loop through and query the category then loop and query the sub category
+    const dep = await Department.findAll()
+    const mega = []
+    
+    
+    if(dep.length > 0)
+    {
+        
+        for(let element = 0; element < dep.length; element++) {
+            var cat = []
+                let d = await ProductCategory.findAll({
+                    where:{
+                        department_id:dep[element].id
+                    }
+                })
+                for(let el = 0; el < d.length; el++){
+                    const subcat = []
+                    let subcatrecord = await ProductSubCategory.findAll({
+                        where:{
+                            category_id:d[el].id
+                        }
+                    })
+                    for(let ex = 0; ex < subcatrecord.length; ex++)
+                    {
+                        subcat.push({
+                            id:subcatrecord[ex].id,
+                            name:subcatrecord[ex].name
+                        })
+                    }
+                    cat.push({
+                        id:d[el].id,
+                        name:d[el].name,
+                        subCategory:subcat
+                    })
+                }
+            mega.push({
+                    id:dep[element].id,
+                    name:dep[element].name,
+                    category:cat
+                })
+        }
+        
+    }
+    console.log(JSON.stringify(mega));
+    res.json({message:"done"})
 }
 
 module.exports = {
