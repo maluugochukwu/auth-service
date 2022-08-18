@@ -15,6 +15,7 @@ const getAllFilteredProducts = async (req,res)=>{
     res.json({responseCode:0,responseMessage:"OK",data:{product:results}});
 }
 const addProduct = async (req,res) => {
+    console.log(req.file)
     const {name,description, weight, categoryId:category_id, brandId:brand_id, price} = req.body
     const dbData = {name,description, weight, category_id, brand_id, price}
     try{
@@ -136,6 +137,62 @@ const getActiveShowcase = async ()=>{
     const [results, metadata] = await db.sequelize.query("SELECT id,name FROM showcase");
     return results;
 }
+const getProductTableList = async(req,res)=>{
+    const requestedFields = []
+    const drawCount = req.body.draw
+    const columns = req.body.columns
+    const length = req.body.length
+    const start = req.body.start
+    const order = req.body.order
+    const search = req.body.search
+    const orderField = columns[order[0]['column']]['data']
+    const orderDir = order[0]['dir']
+    var searchClause = ""
+    for(let x = 0; x<columns.length; x++)
+    {
+        requestedFields.push(columns[x]['data'])
+        if(search.value != "")
+        {
+            searchClause += columns[x]['data']+" LIKE '%"+search.value+"%' OR "
+        }
+    }
+    
+    searchClause = search.value != ""?searchClause.slice(0,-4):" 1 = 1"
+    console.log(searchClause,"secondie")
+    const allowedFields = ['id','name','description','weight','category_id','price','img','has_variant','brand_id','discount','sub_category']
+    var result = requestedFields.every(function(val) {
+
+        return allowedFields.indexOf(val) >= 0;
+      
+      });
+      if(result)
+      {
+          var fields = requestedFields.join(",")
+          const sql = "SELECT "+fields+" FROM product WHERE "+searchClause+" ORDER BY "+orderField+" "+orderDir+" LIMIT "+start+","+length
+        //   console.log(sql,"hmm")
+          const [results, metadata] = await db.sequelize.query(sql);
+        //   {"draw":0,"recordsTotal":258,"recordsFiltered":258,"data":[{"id":"3","firstName":"Cartman","lastName":"Whateveryournameis"}
+        const output = {}
+        const data = []
+        results.forEach(dd=>{
+            let obj = {}
+            for(let x = 0; x<columns.length; x++)
+            {
+                obj[columns[x]['data']] = dd[columns[x]['data']]
+            }
+            data.push(obj)
+        })
+        output['data'] = data
+        output['draw'] = drawCount
+        output['recordsTotal'] = results.length
+        output['recordsFiltered'] = results.length
+          res.json(output);
+      }else
+      {
+          res.json({responseCode:45,responseMessage:"No product available",data:[]});
+      }
+    
+}
 module.exports = {
     getProductShowcase,
     getProductByCategory,
@@ -144,5 +201,6 @@ module.exports = {
     editProduct,
     deleteProduct,
     searchProduct,
-    getProductDetails
+    getProductDetails,
+    getProductTableList
 };
