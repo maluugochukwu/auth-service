@@ -48,7 +48,7 @@ const logEvents = async (message,logName) => {
     }
 }
 const logger = (req,res,next)=>{
-    const message = `${req?.method} ~ ${JSON.stringify(req?.body) } ~ ${req.url} ~ [${req.socket.remoteAddress}]`;
+    const message = `${req?.method} ~ ${JSON.stringify(req?.file) } ~ ${req.url} ~ [${req.socket.remoteAddress}]`;
     const filename = `${format(new Date(),'dd')}.txt`
     logEvents(message,filename);
     next();

@@ -7,28 +7,29 @@ const createDepartment = async (req,res)=>{
     try
     {
         const result = await Department.create({name})
-        res.json({responseCode:0,responseMessage:"ok"})
+        res.status(201).json({success:true,message:"Department created"})
     }catch(err) {
-        res.json({responseCode:89,responseMessage:"Could not create department"})
+        res.status(401).json({errors:[{code:89,message:"Could not create department"}]})
     }
 }
 const deleteDepartment = async (req,res)=>{
     try{
         const count = await Department.destroy({ where: { id:req.params.department_id } });
-        res.json({responseCode:0,responseMessage:`Department deleted`})
+        res.status(200).json({success:true,message:"Department deleted"})
     }catch(er)
     {
-        res.json({responseCode:11,responseMessage:"Could not delete department"})
+        res.status(401).json({errors:[{code:11,message:"Could not delete department"}]})
+        
     }
 }
 const editDepartment = async (req,res)=>{
     const name = req.body.name
     try{
         const result = await Department.update(name,{where:{id:req.params.id}})
-        res.json({responseCode:0,responseMessage:"Department updated"})
+        res.status(200).json({success:true,message:"Department updated"})
     }catch(er)
     {
-        res.json({responseCode:11,responseMessage:"Could not update Department"})
+        res.status(401).json({errors:[{code:60,message:"Could not update department"}]})
     }
 }
 const getDepartments = async (req, res) => {
@@ -76,7 +77,7 @@ const getDepartments = async (req, res) => {
         
     }
     console.log(JSON.stringify(mega));
-    res.json({message:"done"})
+    res.status(200).json({success:true,message:"done"})
 }
 
 module.exports = {

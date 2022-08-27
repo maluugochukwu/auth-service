@@ -22,7 +22,6 @@ const logout = (req,res)=>{
         res.clearCookie('jwt',{httpOnly:true,samesite:'None',secure:true})
     })
 
-    res.status(401).json({
-        message:"Logout successful"
-    })
+   
+    res.status(200).json({success:true,message:"Logout successful"})
 }

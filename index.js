@@ -2,7 +2,10 @@ const express = require('express');
 const app = express();
 const logger = require('./middleware/logEvents');
 const cors = require("cors");
+const multer = require('multer')
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser')
+const formidableMiddleware = require('express-formidable');
 const headers = require('./middleware/headers')
 const {db} = require("./model");
 
@@ -17,13 +20,21 @@ const {db} = require("./model");
 app.use(cors({
     origin:"*"
 }))
-app.use(express.urlencoded({ extended: false }))
+const upload = multer({dest:'./uploads/'})
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }))
+
+// app.use(formidableMiddleware());
 app.use(headers)
 app.use(cookieParser())
+// app.use(bodyParser.urlencoded({ extended: true }))
 // Logger middleware
-app.use(logger);
+// app.use(logger);
 
+app.post('/', upload.single('thumbnail'), (req, res) => {
+    console.log(req.file)
+    res.send(req.body);
+})
 
 
 // route for user login

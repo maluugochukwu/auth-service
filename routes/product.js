@@ -13,10 +13,11 @@ const fileStorageDisk = multer.diskStorage({
 })
 const upload = multer({ storage: fileStorageDisk})
 
+
 router.get('/showcase', productController.getProductShowcase)
 router.post('/filtered', productController.getAllFilteredProducts)
 router.get('/category/:id', productController.getProductByCategory)
-router.post('/', productMiddleware, upload.single('image') , productController.addProduct)
+router.post('/', upload.single('thumbnail') , productMiddleware,  productController.addProduct)
 router.put('/:id', productMiddleware,productController.editProduct)
 router.get('/search/:query',productController.searchProduct)
 router.get('/details/:product_id',productController.getProductDetails)

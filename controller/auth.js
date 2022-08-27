@@ -16,7 +16,7 @@ const login = async (req,res)=>{
         httpOnly:true,maxAge:24 * 60 * 60 * 1000,samesite:'None',secure:true
     });
 
-    res.json({responseCode:0,responseMessage:"login ok",accessToken:tokens.accessToken})
+    res.status(200).json({success:true,message:"Login ok",accessToken:tokens.accessToken})
 }
 const providerAuth     = async (req,res)=>{
     const payload = res.locals.payload
@@ -30,10 +30,10 @@ const providerAuth     = async (req,res)=>{
         {
             const tokens = await issueToken(username)
             setRefreshTokenCookie(tokens.refreshToken,res)
-            res.json({responseCode:0,responseMessage:"login ok",accessToken:tokens.accessToken})
+            res.status(200).json({success:true,message:"Login ok",accessToken:tokens.accessToken})
         }else
         {
-            res.json({responseCode:31,responseMessage:"Login with the provider you used in registering"})
+            res.status(401).json({errors:[{code:31,message:"Login with the provider you used in registering"}]})
         }
     }
     else
@@ -59,10 +59,10 @@ const providerAuth     = async (req,res)=>{
             
             setRefreshTokenCookie(tokens.refreshToken,res)
             
-            res.json({responseCode:0,responseMessage:"login ok",accessToken:tokens.accessToken})
+            res.status(200).json({success:true,message:"Login ok",accessToken:tokens.accessToken})
         }else
         {
-            res.json({responseCode:55,responseMessage:"Could not create user"})
+            res.status(401).json({errors:[{code:55,message:"Could not create user"}]})
         }
         
     }
@@ -84,24 +84,18 @@ const register              = async (req,res)=>{
     registration(obj,provider_id).then((ss) => {
         if(ss)
         {
-            res.json({
-                responseCode:0,
-                responseMessage:"Registration successful"
-            })
+           
+            res.status(201).json({success:true,message:"Registration successful"})
+            
         }else
         {
-            res.json({
-                responseCode:34,
-                responseMessage:"Registration failed"
-            })
+            res.status(401).json({errors:[{code:34,message:"Registration failed"}]})
         }
         
     }).catch(err => {
         console.log(err)
-        res.json({
-            responseCode:34,
-            responseMessage:"Registration failed"
-        })
+        
+        res.status(401).json({errors:[{code:93,message:"Registration failed"}]})
     })
 
     
@@ -226,14 +220,15 @@ const forgotPassword = async (req,res)=>{
         if(result[0] == 1)
         {
             // send email notification
-            res.json({responseCode:0,responseMessage:"Check your email for a link to update set your password"})
+            // res.json({responseCode:0,responseMessage:"Check your email for a link to update set your password"})
+            res.status(200).json({success:true,message:"Check your email for a link to update set your password"})
         }else
         {
-            res.json({responseCode:31,responseMessage:"Username is incorrect"})
+            res.status(401).json({errors:[{code:32,message:"Username is incorrect"}]})
         }
     })
     .catch((error)=>{
-        res.json({responseCode:31,responseMessage:"Username not found"})
+        res.status(401).json({errors:[{code:20,message:"Username not found"}]})
     })
 }
 const setPasswordWithLink = async (req,res)=>{
@@ -247,15 +242,15 @@ const setPasswordWithLink = async (req,res)=>{
         .then((result) => {
             if(result)
             {
-                res.json({responseCode:0,responseMessage:"Password set successfully"})
+                res.status(200).json({success:true,message:"Password set successfully"})
             }else
             {
-                res.json({responseCode:76,responseMessage:"Unable to set password"})
+                res.status(401).json({errors:[{code:76,message:"Unable to set password"}]})
             }
         })
-        .catch(err => res.json({responseCode:72,responseMessage:"Unable to set password"}))
+        .catch(err => res.status(401).json({errors:[{code:76,message:"Unable to set password"}]}))
     }else{
-        res.json({responseCode:6,responseMessage:"Expired or invalid reset link"})
+        res.status(401).json({errors:[{code:76,message:"Expired or invalid reset link"}]})
     }
     
 }

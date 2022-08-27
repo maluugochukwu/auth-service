@@ -20,7 +20,7 @@ const loginCredentialsCheck = async (req,res,next)=>{
         next()
     }else
     {
-        res.status(409).json({message:"username or password is incorrect"})
+        res.status(406).json({errors:[{"code":81,"message":"username or password is incorrect"}]})
     }
 }
 
@@ -36,8 +36,9 @@ const login = (payload) => {
             {
                 const hashedPassword = items[0].password;
                 const match          = await bcrypt.compare(password,hashedPassword);
-                if(match)
+                if(match) // the user password matches
                 {
+                    // check to see if user account is verified
                     resolve(true) ;
                 }
                 else
@@ -63,7 +64,7 @@ const registrationCredentialsCheck = (req,res,next)=>{
         }
     }).then((items)=>{
         if(items.length !== 0){
-            res.status(409).json({message:"Record already exist"})
+            res.status(401).json({errors:[{"code":62,"message":"Record already exist"}]})
         }else
         {
             next();

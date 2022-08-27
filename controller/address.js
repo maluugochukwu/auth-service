@@ -7,14 +7,14 @@ const createAddress      = async (req,res)=>{
     .then((result)=>{
         if(result)
         {
-            res.json({responseCode:0,responseMessage:"Saved address"})
+            res.status(200).json({success:true,message:"Saved address"})
         }else
         {
-            res.json({responseCode:73,responseMessage:"Could not save address"})
+            res.status(401).json({errors:[{code:73,message:"Could not save address"}]})
         }
     })
     .catch((err)=>{
-        res.json({responseCode:63,responseMessage:"Internal server error"})
+        res.status(500).json({errors:[{code:500,message:"Internal server error"}]})
     })
     
 }
@@ -28,25 +28,21 @@ const getAddress = (req,res)=>{
     .then(result=>{
         if(result.length > 0)
         {
-            res.json({
-                responseCode:0,
-                responseMessage:"OK",
-                data:result
-            })
+            
+            res.status(200).json({success:true,message:"OK"})
         }else
         {
-            res.json({
-                responseCode:33,
-                responseMessage:"No Address found"
-            })
+            // res.json({
+            //     responseCode:33,
+            //     responseMessage:"No Address found"
+            // })
+            res.status(401).json({errors:[{code:36,message:"No Address found"}]})
         }
         
     })
     .catch(err=>{
-        res.json({
-            responseCode:33,
-            responseMessage:"Internal server error"
-        })
+        
+        res.status(500).json({errors:[{code:36,message:"Internal server error"}]})
     })
 }
 
@@ -62,23 +58,16 @@ const deleteAddress = (req,res)=>{
     .then(count=>{
         if(count > 1)
         {
-            res.json({
-                responseCode:0,
-                responseMessage:"Address deleted!"
-            })
+           
+            res.status(200).json({success:true,message:"Address deleted!"})
         }else
         {
-            res.json({
-                responseCode:61,
-                responseMessage:"Could not delete address"
-            })
+            res.status(401).json({errors:[{code:624,message:"Could not delete address"}]})
         }
     })
     .catch(err=>{
-        res.json({
-            responseCode:12,
-            responseMessage:"Internal server error"
-        })
+        
+        res.status(500).json({errors:[{code:500,message:"Internal server error"}]})
     })
 }
 
@@ -108,10 +97,8 @@ const editAddress = async (req,res)=>{
             }
         },{transaction:transactionHandler})
         await transactionHandler.commit()
-        res.json({
-            responseCode:0,
-            responseMessage:"Address updated"
-        })
+        
+        res.status(200).json({success:true,message:"Address Updated"})
     }else
     {
         await UserAddress.update(obj,{
@@ -121,10 +108,8 @@ const editAddress = async (req,res)=>{
             }
         },{transaction:transactionHandler})
         await transactionHandler.commit()
-        res.json({
-            responseCode:0,
-            responseMessage:"Address updated"
-        })
+       
+        res.status(200).json({success:true,message:"Address Updated"})
     }
 }
 

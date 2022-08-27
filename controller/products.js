@@ -12,7 +12,8 @@ const getAllFilteredProducts = async (req,res)=>{
     filter += (typeof filters?.category !== 'undefined') ? ` AND product.category_id = '${category}'`:"";
 
     const [results, metadata] = await db.sequelize.query(`SELECT product.id id,product.name name, product.price price,product.description description,product_category.name categoryName, product_category.id categoryId FROM product INNER JOIN product_category ON product.category_id = product_category.id WHERE 1 = 1 ${filter}`);
-    res.json({responseCode:0,responseMessage:"OK",data:{product:results}});
+    // res.json({responseCode:0,responseMessage:"OK",data:{product:results}});
+    res.status(200).json({success:true,message:"ok",data:{product:results}})
 }
 const addProduct = async (req,res) => {
     console.log(req.file)
@@ -20,10 +21,10 @@ const addProduct = async (req,res) => {
     const dbData = {name,description, weight, category_id, brand_id, price}
     try{
         const result = await Product.create(dbData)
-        res.json({responseCode:0,responseMessage:"Product saved"})
+        res.status(200).json({success:true,message:"Product saved"})
     }catch(er)
     {
-        res.json({responseCode:11,responseMessage:"Could not save product"})
+        res.status(401).json({errors:[{code:67,message:"Could not save product"}]})
     }
 }
 const editProduct = async (req,res) => {
@@ -33,8 +34,7 @@ const editProduct = async (req,res) => {
     {
         if(!validKeys.includes(property))
         {
-            res.json({responseCode:91,responseMessage:`${property} is not a valid field`})
-            return
+            res.status(401).json({errors:[{code:99,message:`${property} is not a valid field`}]})
         }
     }
     const newArr = {};
@@ -51,7 +51,7 @@ const editProduct = async (req,res) => {
         res.json({responseCode:0,responseMessage:"Product updated"})
     }catch(er)
     {
-        res.json({responseCode:11,responseMessage:"Could not update product"})
+        res.status(401).json({errors:[{code:14,message:`Could not update product`}]})
     }
 }
 const deleteProduct = async (req,res) => {
@@ -171,21 +171,29 @@ const getProductTableList = async(req,res)=>{
           const sql = "SELECT "+fields+" FROM product WHERE "+searchClause+" ORDER BY "+orderField+" "+orderDir+" LIMIT "+start+","+length
         //   console.log(sql,"hmm")
           const [results, metadata] = await db.sequelize.query(sql);
-        //   {"draw":0,"recordsTotal":258,"recordsFiltered":258,"data":[{"id":"3","firstName":"Cartman","lastName":"Whateveryournameis"}
+          const sqlCount = "SELECT "+fields+" FROM product WHERE "+searchClause
+          const [resultsCount, metadataCount] = await db.sequelize.query(sqlCount);
         const output = {}
         const data = []
         results.forEach(dd=>{
             let obj = {}
             for(let x = 0; x<columns.length; x++)
             {
-                obj[columns[x]['data']] = dd[columns[x]['data']]
+                if(columns[x]['data'] == "price")
+                {
+                    obj[columns[x]['data']] = "NGN "+dd[columns[x]['data']]
+                }else
+                {
+                    obj[columns[x]['data']] = dd[columns[x]['data']]
+                }
+                
             }
             data.push(obj)
         })
         output['data'] = data
         output['draw'] = drawCount
         output['recordsTotal'] = results.length
-        output['recordsFiltered'] = results.length
+        output['recordsFiltered'] = resultsCount.length
           res.json(output);
       }else
       {
