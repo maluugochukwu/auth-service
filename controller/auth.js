@@ -136,6 +136,9 @@ const registration = async (obj,provider_id)=>{
         const password = obj.password
         const hashedPassword = await bcrypt.hash(password,10);
         obj.password         = hashedPassword
+        const verificationCode = generateVerificationCode()
+        obj.email_verification_code = verificationCode
+        obj.email_verification_expire = new Date().setDate(new Date().getDate()+1);
         // console.log(await bcrypt.compare(password,hashedPassword))
     }
 
@@ -159,9 +162,9 @@ const registration = async (obj,provider_id)=>{
                 const message = {
                     to: `${obj.email}`,
                     subject: "Verify your email",
-                    text: `Hello ${obj.firstname} ${obj.lastname},\n Use this code ${generateVerificationCode()} to verify your email`
+                    text: `Hello ${obj.firstname} ${obj.lastname},\n Use this code ${verificationCode} to verify your email`
                 }
-                // sendEmail(message)
+                sendEmail(message)
             }
            return true;
     }
@@ -179,7 +182,7 @@ const sendEmail = (message)=>{
           pass: "7fb0ebe681203e"
         }
       });
-    message.from = "from-example@email.com"
+    message.from = "no-reply@email.com"
       
    transport.sendMail(message, function(err, info) {
         if (err) {
@@ -206,7 +209,42 @@ const setRefreshTokenCookie = (refreshToken,res)=>{
         httpOnly:true,maxAge:24 * 60 * 60 * 1000,samesite:'None',secure:true
     });
 }
-
+const resendEmailVerificationCode = async (req,res)=>{
+    const username = req.params.username
+    const user = await User.findAll({where: {username:username}})
+    // console.log(user[0].is_email_verified,"holala")
+    if(user?.length>0)
+    {
+        // check if email_verification field is 0
+        if(user[0].is_email_verified == 0)
+        {
+            const verificationCode = generateVerificationCode()
+            const expireDate = new Date().setDate(new Date().getDate()+1);
+            User.update({email_verification_code:verificationCode,email_verification_expire:expireDate},{where:{username:username}})
+            .then((result)=>{
+                if(result[0] == 1)
+                {
+                    const message = {
+                        to: `${user[0].email}`,
+                        subject: "Verify your email",
+                        text: `Hello ${user[0].firstname} ${user[0].lastname},\n Use this code ${verificationCode} to verify your email`
+                    }
+                    sendEmail(message)
+                    
+                }
+            })
+            res.status(200).json({success:true,message:"A code has been sent to the email associated to "+username})
+        }else
+        {
+            res.status(401).json({errors:[{code:32,message:"Your email has already been verified"}]})
+        }
+        
+    }else
+    {
+        res.status(401).json({errors:[{code:32,message:"Username does not exist"}]})
+    }
+    
+}
 const forgotPassword = async (req,res)=>{
     // send a link to the user's email to change his password
     const username = req.params.username
@@ -231,13 +269,37 @@ const forgotPassword = async (req,res)=>{
         res.status(401).json({errors:[{code:20,message:"Username not found"}]})
     })
 }
+const confirmVerificationCode = async (req,res)=>{
+    const username = req.params.username
+    const code = req.params.code
+    const [results, metadata] = await db.sequelize.query(`SELECT username FROM user WHERE email_verification_expire > NOW() AND email_verification_code = '${code}' AND username =  '${username}'`);
+    if(results.length > 0)
+    {
+        User.update({is_email_verified:1,email_verification_expire:null},{where: {username:username}})
+        .then((result) => {
+            if(result)
+            {
+                res.status(200).json({success:true,message:"Email verified successfully"})
+            }else
+            {
+                res.status(401).json({errors:[{code:76,message:"Unable to perform operation"}]})
+            }
+        })
+        .catch(err => res.status(401).json({errors:[{code:71,message:"Unable to perform operation"}]}))
+    }else
+    {
+        res.status(401).json({errors:[{code:16,message:"Invalid or expired verification code"}]})
+    }
+}
 const setPasswordWithLink = async (req,res)=>{
     const code           = req.body.code
-    const password      = req.body.password
-    const hashedPassword = await bcrypt.hash(password,10);
+    
     const [results, metadata] = await db.sequelize.query(`SELECT username FROM user WHERE forgotPasswordLinkExpire > NOW() AND forgotPasswordLink = '${code}'`);
     if(results.length > 0)
     {
+        const password      = req.body.password
+        const hashedPassword = await bcrypt.hash(password,10);
+
         User.update({password:hashedPassword,forgotPasswordLink:null},{where: {forgotPasswordLink:code}})
         .then((result) => {
             if(result)
@@ -261,5 +323,7 @@ module.exports = {
     providerAuth,
     register,
     forgotPassword,
-    setPasswordWithLink
+    setPasswordWithLink,
+    resendEmailVerificationCode,
+    confirmVerificationCode
 };

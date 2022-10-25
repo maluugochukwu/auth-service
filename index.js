@@ -40,6 +40,8 @@ app.post('/', upload.single('thumbnail'), (req, res) => {
 // route for user login
 app.use('/auth',require('./routes/auth'));
 
+
+
 // route for get users
 app.use('/user',require('./routes/users'));
 

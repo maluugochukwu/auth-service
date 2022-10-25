@@ -14,13 +14,13 @@ const loginCredentialsCheck = async (req,res,next)=>{
         payload = req.body
     }
     const doLogin = await login(payload)
-    if(doLogin)
+    if(doLogin.status == 0)
     {
         res.locals.payload = res.locals.payload
         next()
     }else
     {
-        res.status(406).json({errors:[{"code":81,"message":"username or password is incorrect"}]})
+        res.status(406).json({errors:[{"code":doLogin.status,"message":doLogin.message}]})
     }
 }
 
@@ -39,15 +39,23 @@ const login = (payload) => {
                 if(match) // the user password matches
                 {
                     // check to see if user account is verified
-                    resolve(true) ;
+                    const isEmailVerified = items[0]['is_email_verified']
+                    if(isEmailVerified == 0)
+                    {
+                        resolve({status:123,message:'Your email needs verification'})
+                    }else
+                    {
+                        resolve({status:0,message:'Login successful'}) ;
+                    }
+                    
                 }
                 else
                 {
-                    resolve(false) ;
+                    resolve({status:55,message:'Invalid username or password'})
                 }
             }else
             {
-                resolve(false);
+                resolve({status:69,message:'Invalid username or password'})
             }
             
         })
