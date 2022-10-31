@@ -28,21 +28,21 @@ const validateAuthProvider = async (req,res,next)=>{
                     next()
                 }else
                 {
-                    res.json({responseCode:58,responseMessage:"Could not verify token"})
+                    return res.status(416).json({errors:[{code:45,message:"Could not verify token"}]})
                 }
             }else
             {
-                res.json({responseCode:58,responseMessage:"Could not verify token"})
+                return res.status(424).json({errors:[{code:45,message:"Could not verify token"}]})
             }
             // const userid = payload['sub'];
         }
         catch(err){
-            res.json({responseCode:58,responseMessage:"Could not verify token"})
+            return res.status(495).json({errors:[{code:45,message:"Could not verify token"}]})
         }
         
     }else
     {
-        res.json({responseCode:77,responseMessage:"Specified provider is not available"})
+        return res.status(418).json({errors:[{code:77,message:"Specified provider is not available"}]})
     }
 }
 

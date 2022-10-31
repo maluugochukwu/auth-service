@@ -18,7 +18,8 @@ const {db} = require("./model");
 
 // enabling cors for third party apps
 app.use(cors({
-    origin:"*"
+    origin:"http://localhost:3000",
+    credentials:true
 }))
 const upload = multer({dest:'./uploads/'})
 app.use(express.json());

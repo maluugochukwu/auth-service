@@ -159,12 +159,12 @@ const registration = async (obj,provider_id)=>{
              await transactionHandler.commit()
             if(provider_id == 0)
             {
-                const message = {
-                    to: `${obj.email}`,
-                    subject: "Verify your email",
-                    text: `Hello ${obj.firstname} ${obj.lastname},\n Use this code ${verificationCode} to verify your email`
-                }
-                sendEmail(message)
+                // const message = {
+                //     to: `${obj.email}`,
+                //     subject: "Verify your email",
+                //     text: `Hello ${obj.firstname} ${obj.lastname},\n Use this code ${verificationCode} to verify your email`
+                // }
+                // sendEmail(message)
             }
            return true;
     }
@@ -196,7 +196,7 @@ const sendEmail = (message)=>{
 }
 const generateVerificationCode = ()=>{
     let number = "";
-    for(let x = 0; x < 6; x++)
+    for(let x = 0; x < 5; x++)
     {
         let b = Math.floor(Math.random() * 10) + 1;
         number += b;
@@ -233,6 +233,10 @@ const resendEmailVerificationCode = async (req,res)=>{
                     
                 }
             })
+            const email = user[0].email
+            const email_length = email.length
+            const share = Math.round(email_length/3)
+            const startIndex = share+1;
             res.status(200).json({success:true,message:"A code has been sent to the email associated to "+username})
         }else
         {
@@ -241,7 +245,7 @@ const resendEmailVerificationCode = async (req,res)=>{
         
     }else
     {
-        res.status(401).json({errors:[{code:32,message:"Username does not exist"}]})
+        res.status(401).json({errors:[{code:37,message:"Username does not exist"}]})
     }
     
 }

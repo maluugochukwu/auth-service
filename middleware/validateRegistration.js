@@ -3,10 +3,10 @@ const { body,validationResult,check }  = require('express-validator');
 
 // Data validation RULES --------------------------------
 const schemaRule = [
-    check("username").exists().withMessage({responseCode:78,responseMessage:"username field is missing"}).bail().notEmpty().withMessage({responseCode:78,responseMessage:"username field is required"}),
-    check("password",{responseCode:14,responseMessage:"Password must have min of 8 characters and contain a number"}).isLength({min:8}).matches(/\d/),
-    check("email",{responseCode:14,responseMessage:"email field is not a valid email"}).notEmpty().isEmail(),
-    check("role",{responseCode:14,responseMessage:"role field is required"}).isArray(),
+    check("username").exists().withMessage({code:78,message:"username field is missing"}).bail().notEmpty().withMessage({responseCode:78,responseMessage:"username field is required"}),
+    check("password",{code:14,message:"Password must have min of 8 characters and contain a number"}).isLength({min:8}).matches(/\d/),
+    check("email",{code:14,message:"email field is not a valid email"}).notEmpty().isEmail(),
+    // check("role",{code:14,message:"role field is required"}).isArray(),
 ]
 // ------
 
