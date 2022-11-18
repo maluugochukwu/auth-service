@@ -1,6 +1,7 @@
 const { models: {UserRefreshToken,User,UserRole,Role},db }  = require('../model');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer')
+const {issueToken,setRefreshTokenCookie} = require("../utils/issueToken")
 const crypto = require('crypto');
 const bcrypt = require('bcrypt'); 
 require('dotenv').config();
@@ -8,14 +9,8 @@ require('dotenv').config();
 const login = async (req,res)=>{
     console.log(req.originalUrl);
     const {username} = req.body;
-    const tokens = await issueToken(username)
-    //save refreshToken to db for the user
-    UserRefreshToken.create({username: username,refresh_token:tokens.refreshToken});
-    
-    res.cookie('jwt',tokens.refreshToken, {
-        httpOnly:true,maxAge:24 * 60 * 60 * 1000,samesite:'None',secure:true
-    });
-
+    const tokens = await issueToken(username, false)
+    setRefreshTokenCookie(tokens.refreshToken,res)
     res.status(200).json({success:true,message:"Login ok",accessToken:tokens.accessToken})
 }
 const providerAuth     = async (req,res)=>{
@@ -28,7 +23,7 @@ const providerAuth     = async (req,res)=>{
         const user_provider_id = user[0].provider_id
         if(provider_id == user_provider_id)
         {
-            const tokens = await issueToken(username)
+            const tokens = await issueToken(username,false)
             setRefreshTokenCookie(tokens.refreshToken,res)
             res.status(200).json({success:true,message:"Login ok",accessToken:tokens.accessToken})
         }else
@@ -55,7 +50,7 @@ const providerAuth     = async (req,res)=>{
         const create_user = await registration(obj,provider_id)
         if(create_user)
         {
-            const tokens = await issueToken(username)
+            const tokens = await issueToken(username,false)
             
             setRefreshTokenCookie(tokens.refreshToken,res)
             
@@ -100,33 +95,33 @@ const register              = async (req,res)=>{
 
     
 }
-const issueToken = async username =>{
-    const [results, metadata] = await db.sequelize.query(`SELECT username, user_role.role_id as u_role, role_name FROM user_role INNER JOIN role ON user_role.role_id = role.role_id WHERE username = '${username}'`)
-    const userRoles = []
-    results.forEach(role => userRoles.push({id:role.u_role,name:role.role_name}))
-    console.log(userRoles,"my roles")
-    const accessToken = jwt.sign(
-        {
-            username:username,
-            role:userRoles
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        {expiresIn:'6000s'}
-    );
-    const refreshToken = jwt.sign(
-        {
-            username:username,
-            role:userRoles
-        },
-        process.env.REFRESH_TOKEN_SECRET,
-        {expiresIn:'1d'}
-    );
-    await saveRefreshToken(username,refreshToken)
-    return {accessToken,refreshToken}
-}
-const saveRefreshToken = async (username,refreshTokenString)=>{
-    await UserRefreshToken.create({username: username,refresh_token:refreshTokenString});
-}
+// const issueToken = async username =>{
+//     const [results, metadata] = await db.sequelize.query(`SELECT username, user_role.role_id as u_role, role_name FROM user_role INNER JOIN role ON user_role.role_id = role.role_id WHERE username = '${username}'`)
+//     const userRoles = []
+//     results.forEach(role => userRoles.push({id:role.u_role,name:role.role_name}))
+//     console.log(userRoles,"my roles")
+//     const accessToken = jwt.sign(
+//         {
+//             username:username,
+//             role:userRoles
+//         },
+//         process.env.ACCESS_TOKEN_SECRET,
+//         {expiresIn:'6000s'}
+//     );
+//     const refreshToken = jwt.sign(
+//         {
+//             username:username,
+//             role:userRoles
+//         },
+//         process.env.REFRESH_TOKEN_SECRET,
+//         {expiresIn:'1d'}
+//     );
+//     await saveRefreshToken(username,refreshToken)
+//     return {accessToken,refreshToken}
+// }
+// const saveRefreshToken = async (username,refreshTokenString)=>{
+//     await UserRefreshToken.create({username: username,refresh_token:refreshTokenString});
+// }
 const registration = async (obj,provider_id)=>{
     if(provider_id != 0) // 3rd party auth provider 
     {
@@ -143,7 +138,6 @@ const registration = async (obj,provider_id)=>{
     }
 
     const {role,username} = obj;
-    
     let user_role = [];
     role.map((rl)=>{
         user_role.push({username,role_id:rl})
@@ -196,19 +190,15 @@ const sendEmail = (message)=>{
 }
 const generateVerificationCode = ()=>{
     let number = "";
-    for(let x = 0; x < 5; x++)
+    for(let x = 0; x <= 4; x++)
     {
-        let b = Math.floor(Math.random() * 10) + 1;
+        let b = Math.floor(Math.random() * 9 + 1);
         number += b;
     }
     console.log(number)
     return number;
 }
-const setRefreshTokenCookie = (refreshToken,res)=>{
-    res.cookie('jwt',refreshToken, {
-        httpOnly:true,maxAge:24 * 60 * 60 * 1000,samesite:'None',secure:true
-    });
-}
+
 const resendEmailVerificationCode = async (req,res)=>{
     const username = req.params.username
     const user = await User.findAll({where: {username:username}})
@@ -234,10 +224,10 @@ const resendEmailVerificationCode = async (req,res)=>{
                 }
             })
             const email = user[0].email
-            const email_length = email.length
-            const share = Math.round(email_length/3)
-            const startIndex = share+1;
-            res.status(200).json({success:true,message:"A code has been sent to the email associated to "+username})
+            var maskid = email.replace(/^(.)(.*)(.@.*)$/,
+                (_, a, b, c) => a + b.replace(/./g, '*') + c
+            );
+            res.status(200).json({success:true,message:`A code has been sent to the email <b>${maskid}</b> associated to ${username}`})
         }else
         {
             res.status(401).json({errors:[{code:32,message:"Your email has already been verified"}]})

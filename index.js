@@ -62,6 +62,10 @@ app.use('/tag',require('./routes/tag'));
 app.use('/department',require('./routes/department'));
 
 
+// route for refreshToken
+app.use('/refreshToken',require('./routes/refreshToken'));
+
+
 
 // route for cart
 // app.use('/cart',require('./routes/cart'));

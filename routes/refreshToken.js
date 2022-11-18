@@ -1,4 +1,5 @@
 const app      = require('express');
 const refreshToken = app.Router();
-refreshToken.post('/',require('../controller/refreshToken'))
+const refresh = require('../controller/refreshToken')
+refreshToken.post('/',refresh.refreshToken)
 module.exports = refreshToken;

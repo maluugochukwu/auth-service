@@ -1,69 +1,41 @@
 const { models: {User,UserRefreshToken},db }    = require('../model');
 const jwt = require('jsonwebtoken');
+const {issueToken} = require("../utils/issueToken")
 require('dotenv').config();
-const refreshToken = async (req,res)=>{
+const refreshToken =  (req,res)=>{
     const cookies = req.cookies
-    if(!cookies?.jwt) return res.sendStatus(403)
+    if(!cookies?.jwt) return res.status(403).json({errors:[{
+        code:62,message:"Cannot find token"
+    }]})
     const refreshTokenString = cookies.jwt;
     UserRefreshToken.findAll({
         where:{
             refresh_token: refreshTokenString
         }
     }).then((items)=>{
-        if(!items) return res.sendStatus(403)
+        if(!items) return res.status(403).json({errors:[{
+            code:75,message:"Invalid refresh token"
+        }]})
         
         const dbUser = items[0].username;
         jwt.verify(
         refreshTokenString,
         process.env.REFRESH_TOKEN_SECRET,
-        (err,decoded)=>{
-            if(err) return res.sendStatus(403)
-            if(dbUser !== decoded.username)  return res.sendStatus(409);
-
-            const accessToken = jwt.sign(
-                {
-                    username:"",
-                    role:[]
-                },
-                process.env.ACCESS_TOKEN_SECRET,
-                {expiresIn:'60s'}
-            );
-            const refreshToken = jwt.sign(
-                {
-                    username:"",
-                    role:[]
-                },
-                process.env.REFRESH_TOKEN_SECRET,
-                {expiresIn:'1d'}
-            );
-            const transactionHandler = await db.sequelize.transaction();
-            try{
-                // delete the old refresh token
-                await UserRefreshToken.destroy({
-                    where: {
-                        refresh_token:refreshTokenString
-                    }
-                },{transaction:transactionHandler});
-
-                //save refreshToken to db for the user
-                await UserRefreshToken.create({username: dbUser,refresh_token:refreshTokenString},{transaction:transactionHandler});
-
-                await traansactionHandler.commit();
-
-                res.cookie('jwt',refreshToken, {httpOnly:true,maxAge:24 * 60 * 60 * 1000,samesite:'None',secure:true});
-
-                res.json({message:"access token created",accessToken})
-            }
-            catch(e){
-                await transactionHandler.rollback();
-                res.status(403).json({error:[{
-                    code:68,message:"could not create refresh token"
-                }]})
-            }
+        async (err,decoded)=>{
+            if(err) return res.status(403).json({errors:[{
+                code:31,message:"could not verify refresh token"
+            }]})
+            if(dbUser !== decoded.username)  return res.status(409).json({error:[{
+                code:16,message:"Token has been tampered"
+            }]});
+            const token = await issueToken(dbUser,true)
+            const accessToken = token.accessToken
+            return res.status(200).json({success:false,message:"access token created",token:accessToken})
+            
             
         }
     )
     })
 }
 
-module.exports = refreshToken;
+module.exports = {refreshToken};
