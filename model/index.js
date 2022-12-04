@@ -29,7 +29,13 @@ models.AuthProvider         = require('./auth_provider')(sequelize,Sequelize.Dat
 models.UserAddress         = require('./user_address')(sequelize,Sequelize.DataTypes);
 models.Transaction         = require('./transaction')(sequelize,Sequelize.DataTypes);
 models.Department         = require('./department')(sequelize,Sequelize.DataTypes);
+models.Menu         = require('./menu')(sequelize,Sequelize.DataTypes);
+models.MenuGroup         = require('./menu_group')(sequelize,Sequelize.DataTypes);
 
-
+models.MenuGroup.belongsTo(models.Role)
+// User.hasOne(Invoice, {
+//     foreignKey: "invoice_creator",
+//     sourceKey: "firstName",
+//   });
 
 module.exports = {db,models};

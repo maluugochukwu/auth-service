@@ -65,6 +65,12 @@ app.use('/department',require('./routes/department'));
 // route for refreshToken
 app.use('/refreshToken',require('./routes/refreshToken'));
 
+// route for Menus
+app.use('/menu',require('./routes/menu'));
+
+// route for Menu groups
+app.use('/menuGroup',require('./routes/menu_group'));
+
 
 
 // route for cart

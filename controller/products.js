@@ -74,6 +74,7 @@ const searchProduct = async (req,res) => {
     const [results, metadata] = await db.sequelize.query(`SELECT * FROM product INNER JOIN product_category ON product.category_id = product_category.id INNER JOIN product_tag ON product.id = product_tag.product_id  WHERE product_tag.tagname LIKE '%${query}%' OR product.name LIKE '%${query}%' `);
     res.json({responseCode:0,responseMessage:"OK",data:{product:results}});
 }
+
 const getProductDetails = async (req,res)=>{
     // get the products and option details
     // such as brand
@@ -181,7 +182,7 @@ const getProductTableList = async(req,res)=>{
             {
                 if(columns[x]['data'] == "price")
                 {
-                    obj[columns[x]['data']] = "NGN "+dd[columns[x]['data']]
+                    obj[columns[x]['data']] = dd[columns[x]['data']]
                 }else
                 {
                     obj[columns[x]['data']] = dd[columns[x]['data']]
@@ -201,6 +202,15 @@ const getProductTableList = async(req,res)=>{
       }
     
 }
+const productList = (req,res)=>{
+    // to get records from the product table
+    // want to filter records from the product table
+    // pass start and end record
+    // sort the fields of our record
+    console.log(req.body.column[0].data)
+    // const sql = "SELECT name,description,weight,price,img,discount FROM product WHERE "+searchClause+" ORDER BY "+orderField+" "+orderDir+" LIMIT "+start+","+length
+    return res.send("good")
+}
 module.exports = {
     getProductShowcase,
     getProductByCategory,
@@ -210,5 +220,6 @@ module.exports = {
     deleteProduct,
     searchProduct,
     getProductDetails,
-    getProductTableList
+    getProductTableList,
+    productList
 };
