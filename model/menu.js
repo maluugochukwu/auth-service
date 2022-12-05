@@ -18,6 +18,9 @@ module.exports = (sequelize,DataTypes)=>{
         },
         icon:{
             type:DataTypes.STRING(60)
+        },
+        posted_user:{
+            type:DataTypes.STRING(80)
         }
     },
     {
